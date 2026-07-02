@@ -44,9 +44,12 @@ export default function UserProfilePage() {
     const initial = displayName ? displayName.trim().charAt(0).toUpperCase() : "?";
 
     const handleLogout = async () => {
-        if (window.confirm("Bạn có chắc chắn muốn đăng xuất?")) {
+        try {
             await signOut();
-            navigate("/auth");
+            navigate("/auth", { replace: true });
+        } catch (err) {
+            console.error("Logout failed", err);
+            toast({ title: "Lỗi", description: "Đăng xuất thất bại", variant: "destructive" });
         }
     };
 

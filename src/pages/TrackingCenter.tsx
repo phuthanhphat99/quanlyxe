@@ -323,7 +323,7 @@ export default function TrackingCenter() {
     const activeStep = (coordinationSteps || []).find((step: any) => step.id === reportStep);
     const tripLabel = selectedTrip?.trip_code || effectiveTripId || 'N/A';
     const payloadText = [
-      'FleetPro Tracking Coordination',
+      'Phú An Tracking Coordination',
       `Step: ${activeStep?.title || reportStep}`,
       `Owner lane: ${activeStep?.owner || 'unknown'}`,
       `Role: ${normalizedRole}`,

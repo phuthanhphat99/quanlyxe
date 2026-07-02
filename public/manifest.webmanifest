@@ -1,7 +1,7 @@
 {
-  "name": "FleetPro Driver",
-  "short_name": "FleetPro",
-  "description": "Check-in GPS va theo doi hanh trinh tai xe theo thoi gian thuc.",
+  "name": "Phú An Driver",
+  "short_name": "Phú An",
+  "description": "Hệ thống quản lý vận tải nội bộ Phú An.",
   "start_url": "/driver",
   "scope": "/",
   "display": "standalone",

@@ -18,7 +18,7 @@ export const amountSchema = z.number().min(0, { message: 'Số tiền/Chi phí p
 
 // Full Schemas (Partial definitions mapped to what's going to firestore)
 export const VehicleSchema = z.object({
-  id: vehicleIdSchema.optional(),
+  id: z.string().optional(), // Firestore ID can be anything
   'Mã xe': vehicleIdSchema.optional(),
   vehicle_code: vehicleIdSchema.optional(),
   license_plate: z.string().regex(/^[0-9]{2}[A-Z]-[0-9]{3,5}(\.[0-9]{2})?$/, { message: 'Biển số sai chuẩn (VD: 51C-123.45 hoặc 79H-1234)' }),
@@ -47,16 +47,16 @@ export const VehicleSchema = z.object({
   status: z.enum(['active', 'maintenance', 'inactive', 'on_trip']).default('active'),
   notes: z.string().optional().nullable(),
 }).passthrough().refine(data => {
-  const idValue = data.id || data['Mã xe'] || data.vehicle_code;
-  if (idValue && typeof idValue === 'string') {
-    return /^(VEH-\d{4}-\d+|VEH\d{4}|XE\d{4}|XE\d{4}-\d+)$/.test(idValue);
+  const codeValue = data.vehicle_code || data['Mã xe'];
+  if (codeValue && typeof codeValue === 'string') {
+    return /^(VEH-\d{4}-\d+|VEH\d{4}|XE\d{4}|XE\d{4}-\d+)$/.test(codeValue);
   }
   return true;
 }, { message: 'Mã xe sai định dạng chuẩn (VD: VEH-2604-01 hoặc XE0001)', path: ['vehicle_code'] });
 
 
 export const DriverSchema = z.object({
-  id: driverIdSchema.optional(),
+  id: z.string().optional(),
   'Mã tài xế': driverIdSchema.optional(),
   driver_code: driverIdSchema.optional(),
   full_name: z.string().min(1, { message: 'Bắt buộc nhập họ tên' }),
@@ -76,15 +76,15 @@ export const DriverSchema = z.object({
   status: z.string().default('active'),
   notes: z.string().optional().nullable(),
 }).passthrough().refine(data => {
-  const idValue = data.id || data['Mã tài xế'] || data.driver_code;
-  if (idValue && typeof idValue === 'string') {
-    return /^(DRV-\d{4}-\d+|DRV\d{4}|TX\d{4}|TX\d{4}-\d+)$/.test(idValue);
+  const codeValue = data['Mã tài xế'] || data.driver_code;
+  if (codeValue && typeof codeValue === 'string') {
+    return /^(DRV-\d{4}-\d+|DRV\d{4}|TX\d{4}|TX\d{4}-\d+)$/.test(codeValue);
   }
   return true;
 }, { message: 'Mã tài xế sai định dạng chuẩn (Bắt buộc DRV- hoặc TX + 4 số)', path: ['driver_code'] });
 
 export const TripSchema = z.object({
-  id: tripIdSchema.optional(),
+  id: z.string().optional(),
   'Mã chuyến': tripIdSchema.optional(),
   trip_code: tripIdSchema.optional(),
   status: z.string().optional().default('draft'),
@@ -113,10 +113,10 @@ export const TripSchema = z.object({
   adjustment_notes: z.string().optional().nullable(),
 }).passthrough()
 .refine(data => {
-  const idValue = data.id || data['Mã chuyến'] || data.trip_code;
-  if (idValue && typeof idValue === 'string') {
+  const codeValue = data['Mã chuyến'] || data.trip_code;
+  if (codeValue && typeof codeValue === 'string') {
     // Accept: TRP-2604-01 (global standard), CD2604-01 (legacy monthly), CD00001 (legacy), LĐX- (driver self-draft)
-    return /^(TRP-\d{4}-\d+|TRP\d{4}|CD\d{4}|CD\d{4}-\d+|LĐX-[\w\d-]+)$/.test(idValue);
+    return /^(TRP-\d{4}-\d+|TRP\d{4}|CD\d{4}|CD\d{4}-\d+|LĐX-[\w\d-]+)$/.test(codeValue);
   }
   return true;
 }, { message: 'Mã chuyến không hợp lệ (VD: TRP-2604-01 hoặc CD0001)', path: ['trip_code'] })
@@ -227,7 +227,7 @@ export const CustomerSchema = z.object({
   customer_code: customerIdSchema.optional(),
   customer_name: z.string().min(1, { message: 'Phải nhập tên doanh nghiệp/khách hàng' }),
   customer_type: z.enum(['Doanh nghiệp', 'Cá nhân']).default('Doanh nghiệp'),
-  tax_code: z.string().regex(/^[0-9]{10,13}$/, { message: 'Mã số thuế phải từ 10-13 chữ số' }).optional().nullable(),
+  tax_code: z.string().regex(/^[0-9]{10,13}$/, { message: 'Mã số thuế phải từ 10-13 chữ số' }).optional().nullable().or(z.literal('')),
   contact_person: z.string().optional().nullable(),
   phone: z.string().min(8, { message: 'Bắt buộc nhập SĐT liên hệ' }),
   email: z.string().email().optional().or(z.literal('')),

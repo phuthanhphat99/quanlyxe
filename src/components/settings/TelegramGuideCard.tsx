@@ -53,7 +53,7 @@ export const TelegramGuideCard = () => {
               <Users className="w-4 h-4" /> Thêm Bot vào nhóm trò chuyện
             </h4>
             <p className="text-sm text-muted-foreground leading-relaxed">
-              Tạo một Group Chat (ví dụ: "Thông báo FleetPro") và thêm Bot vừa tạo vào nhóm.
+              Tạo một Group Chat (ví dụ: "Thông báo Phú An") và thêm Bot vừa tạo vào nhóm.
               Sau đó, lấy <strong>Chat ID</strong> của nhóm (thường bắt đầu bằng dấu <code>-</code> như <code>-100123...</code>).
             </p>
             <div className="flex items-center gap-2 mt-2">

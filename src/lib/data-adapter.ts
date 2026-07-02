@@ -2056,7 +2056,7 @@ const seedNewTenantDemoData = async (options: TenantSeedOptions) => {
         if (tenantId === 'internal-tenant-1') {
             demoDriver.email = 'taixedemo@tnc.io.vn';
         } else if (tenantId === 'internal-tenant-phuan') {
-            demoDriver.email = 'taixe1@phuancr.com';
+            demoDriver.email = 'taixe1@phuancr.vn';
         } else {
             // New tenant: generate a unique email so it doesn't collide with known demo accounts
             demoDriver.email = `driver1+${tenantId}@fleetpro.vn`;
@@ -2293,7 +2293,7 @@ const ensureTenantDemoReadiness = async (payload: EnsureDemoReadinessPayload) =>
         await clearTenantOperationalData({ tenantId, keepUserId: adminUid, isInternalForce: true });
     }
 
-    const companyName = String(payload?.company_name || '').trim() || 'FleetPro Demo Company';
+    const companyName = String(payload?.company_name || '').trim() || 'Phú An';
 
     // adminUid already set above from user.uid
     let adminEmail = String(payload?.email || '').trim() || user.email || '';
@@ -2353,6 +2353,7 @@ const ensureTenantDemoReadiness = async (payload: EnsureDemoReadinessPayload) =>
 export const isProtectedSharedDemoTenant = (tenantId: string) => {
     if (!tenantId) return false;
     if (tenantId === 'internal-tenant-1' || tenantId === 'internal-tenant-2') return true;
+    if (tenantId === 'internal-tenant-phuan') return false; // Explicitly not a demo tenant
     if (tenantId.startsWith('internal-tenant-')) return true;
     return false;
 };

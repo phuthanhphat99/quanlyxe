@@ -279,8 +279,9 @@ export default function TripsRevenue() {
     // Data Hooks
     const isFiltered = searchQuery || statusFilter.length > 0 || vehicleFilter || driverFilter || customerFilter || routeFilter || (dateRange.from && dateRange.to);
 
-    const { data: paginatedTrips, isLoading: loadingPaged, refetch: refetchPaged } = useTripsPaginated(currentPage, pageSize);
-    const { data: allTripsData = [], isLoading: loadingAll, refetch: refetchAll } = useTrips();
+    const { data: paginatedTrips, isLoading: loadingPaged, refetch: refetchPaged, error: errorPaged } = useTripsPaginated(currentPage, pageSize);
+    const { data: allTripsData = [], isLoading: loadingAll, refetch: refetchAll, error: errorAll } = useTrips();
+    const error = errorPaged || errorAll;
     
     // SaaS Strategic Logic:
     // 1. If searching/filtering -> use the 'all' set (limited to 100-200 most recent) for client-side filtering.

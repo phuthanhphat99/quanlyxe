@@ -93,9 +93,9 @@ export function InstallAppPrompt() {
               </div>
               
               <div className="space-y-2">
-                <h3 className="text-xl font-bold text-slate-900 tracking-tight">Cài đặt FleetPro Driver</h3>
+                <h3 className="text-xl font-bold text-slate-900 tracking-tight">Cài đặt Phú An Driver</h3>
                 <p className="text-slate-600 text-[15px] leading-relaxed">
-                  Cài đặt biểu tượng FleetPro lên màn hình chính để mở nhanh, check-in định vị và cập nhật hành trình ổn định hơn.
+                  Cài đặt biểu tượng Phú An lên màn hình chính để mở nhanh, check-in định vị và cập nhật hành trình ổn định hơn.
                 </p>
               </div>
 

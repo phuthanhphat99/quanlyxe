@@ -90,79 +90,7 @@ export default function Dashboard() {
         </div>
       )}
 
-      {/* Trial Progress Bar — visible to trial users */}
-      {currentPlan === 'trial' && role === 'admin' && (() => {
-        const trialEnd = companySettings?.subscription?.trial_ends_at;
-        const trialEndMs = trialEnd ? new Date(trialEnd).getTime() : Date.now() + 14 * 24 * 60 * 60 * 1000;
-        const totalDays = 14;
-        const daysLeft = Math.max(0, Math.ceil((trialEndMs - Date.now()) / (1000 * 60 * 60 * 24)));
-        const daysUsed = totalDays - daysLeft;
-        const progress = Math.min(100, Math.round((daysUsed / totalDays) * 100));
-        const isUrgent = daysLeft <= 3;
 
-        return (
-          <div className={`rounded-xl p-4 border shadow-sm ${isUrgent ? 'bg-red-50 border-red-200' : 'bg-gradient-to-r from-blue-50 to-indigo-50 border-blue-200'}`}>
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-              <div className="flex-1 min-w-0">
-                <div className="flex items-center gap-2 mb-2">
-                  {isUrgent ? (
-                    <AlertTriangle className="w-4 h-4 text-red-500 shrink-0" />
-                  ) : (
-                    <Zap className="w-4 h-4 text-blue-500 shrink-0" />
-                  )}
-                  <span className={`text-sm font-bold ${isUrgent ? 'text-red-700' : 'text-blue-700'}`}>
-                    {isUrgent ? `⚠️ Chỉ còn ${daysLeft} ngày dùng thử!` : `📅 Dùng thử: ${daysUsed}/${totalDays} ngày`}
-                  </span>
-                  <span className="text-xs text-slate-500 ml-auto hidden sm:inline">Gói Trial • 5 xe / 5 tài xế</span>
-                </div>
-                <div className="w-full bg-slate-200 rounded-full h-2.5 overflow-hidden">
-                  <div
-                    className={`h-full rounded-full transition-all duration-1000 ${isUrgent ? 'bg-red-500' : 'bg-gradient-to-r from-blue-500 to-indigo-500'}`}
-                    style={{ width: `${progress}%` }}
-                  />
-                </div>
-              </div>
-              <Link to="/pricing">
-                <Button size="sm" className={`whitespace-nowrap ${isUrgent ? 'bg-red-600 hover:bg-red-500' : 'bg-blue-600 hover:bg-blue-500'} text-white`}>
-                  {isUrgent ? '🔥 Nâng cấp ngay' : 'Xem gói Pro →'}
-                </Button>
-              </Link>
-            </div>
-          </div>
-        );
-      })()}
-
-      {isPaidPlan && isDemoMode && role === 'admin' && (
-         <div className="bg-blue-50 border-l-4 border-blue-400 p-3 mb-4 rounded shadow-sm flex items-center justify-between">
-           <div className="flex items-center gap-2 text-blue-800 text-sm">
-             <Zap className="w-4 h-4 fill-blue-400" />
-             <span>Bạn đang sử dụng bộ dữ liệu chuẩn (Logic Thực Chiến). Dữ liệu này được thiết kế để kiểm soát chi phí và doanh thu tối ưu.</span>
-           </div>
-           <Button
-              size="sm"
-              variant="outline"
-              className="h-7 text-[10px] bg-white border-blue-200 text-blue-600 hover:bg-blue-50"
-              onClick={async () => {
-                if (!tenantId) return;
-                const res = await dataAdapter.auth.ensureTenantDemoReadiness({
-                  tenantId,
-                  role: role || 'viewer',
-                  email: user?.email || '',
-                  full_name: user?.full_name || '',
-                  uid: userId || '',
-                  force: true, 
-                });
-                if (res?.success) {
-                  toast({ title: '✅ Reset Dữ liệu chuẩn', description: 'Đã nạp lại bộ dữ liệu Logic Thực Chiến.' });
-                  setTimeout(() => window.location.reload(), 1000);
-                }
-              }}
-            >
-              <RefreshCw className="mr-1 h-3 w-3" />
-              Reset Demo
-            </Button>
-         </div>
-      )}
 
       <Tabs value={activeTab} onValueChange={handleTabChange} className="w-full">
         <div className="sticky top-0 z-10 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 py-2 -mx-2 px-2">

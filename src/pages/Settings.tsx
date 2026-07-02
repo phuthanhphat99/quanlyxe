@@ -308,7 +308,7 @@ export default function Settings() {
                          email: user?.email || '',
                          full_name: user?.full_name || '',
                          uid: userId || '',
-                         company_name: companyForm.company_name || 'FleetPro Demo',
+                         company_name: companyForm.company_name || 'Phú An',
                          force: true
                        });
                        if (res?.success) {

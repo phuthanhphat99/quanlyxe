@@ -87,7 +87,7 @@ export default function SuperAdminDashboard() {
                     </div>
                     <div>
                         <h1 className="text-3xl font-extrabold tracking-tight text-slate-900">Hệ Thống Quản Trị Trung Tâm</h1>
-                        <p className="text-slate-500">Dành riêng cho Super Admin — Quản lý gói cước & Quyền hạn FleetPro.</p>
+                        <p className="text-slate-500">Dành riêng cho Super Admin — Quản lý gói cước & Quyền hạn Phú An.</p>
                     </div>
                 </div>
             </header>

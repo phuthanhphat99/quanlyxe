@@ -56,7 +56,7 @@ docs/             # Architecture & developer guide
 | Tenant ID | Company | URL | Admin |
 |---|---|---|---|
 | `internal-tenant-1` | FleetPro Demo | tnc.io.vn | admindemo@tnc.io.vn |
-| `internal-tenant-phuan` | Công ty Phú An | phuan.tnc.io.vn | admin@phuancr.com |
+| `internal-tenant-phuan` | Công ty Phú An | phuan.tnc.io.vn | admin@phuancr.vn |
 
 **Demo password (all accounts):** `Demo@1234`
 

@@ -63,7 +63,6 @@ import { useTrips } from "@/hooks/useTrips";
 import { useClosedPeriods, isDateInClosedPeriod } from '@/hooks/useAccountingPeriods';
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { usePermissions } from "@/hooks/usePermissions";
-import { getNextCodeByPrefix, getMonthlyPrefix } from "@/lib/code-generator";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { SmartExpenseAudit } from "@/components/finance/SmartExpenseAudit";
 import { InvoiceOCRDialog } from "@/components/expenses/InvoiceOCRDialog";

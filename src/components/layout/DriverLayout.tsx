@@ -14,9 +14,11 @@ export function DriverLayout() {
     const normalizedRole = normalizeUserRole(role);
 
     const handleLogout = async () => {
-        if (window.confirm("Bạn có chắc chắn muốn đăng xuất?")) {
+        try {
             await signOut();
-            navigate("/auth");
+            navigate("/auth", { replace: true });
+        } catch (err) {
+            console.error("Logout failed", err);
         }
     };
 

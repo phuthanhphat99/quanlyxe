@@ -155,7 +155,7 @@ export default function Pricing() {
                     Kiểm Soát Toàn Diện Đội Xe — <span className="text-blue-700">Tăng Lợi Nhuận Thực Tế</span>
                 </h1>
                 <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-                    Từ quản lý chuyến đi, chi phí, tài xế đến báo cáo tài chính tức thời — FleetPro giúp chủ xe <strong>nắm số liệu thật, ngăn thất thoát, ra quyết định nhanh</strong>.
+                    Từ quản lý chuyến đi, chi phí, tài xế đến báo cáo tài chính tức thời — Phú An giúp chủ xe <strong>nắm số liệu thật, ngăn thất thoát, ra quyết định nhanh</strong>.
                 </p>
                 <div className="flex flex-wrap gap-4 justify-center mt-6 text-sm text-slate-600">
                     <div className="flex items-center gap-1.5"><MapPin className="w-4 h-4 text-blue-500" /> GPS Tracking tài xế real-time</div>
@@ -232,7 +232,7 @@ export default function Pricing() {
                                             intent: "CAPTURE",
                                             purchase_units: [
                                                 {
-                                                    description: `FleetPro Gói Chuyên Nghiệp - Tenant: ${tenantId}`,
+                                                    description: `Phú An Gói Chuyên Nghiệp - Tenant: ${tenantId}`,
                                                     amount: {
                                                         currency_code: "USD",
                                                         value: "23.00", // ~567k VND per month
@@ -413,7 +413,7 @@ export default function Pricing() {
                 <p>Bảo mật cấp doanh nghiệp. Thanh toán được mã hóa SSL 100%. Dữ liệu lưu trữ trên Firebase (Google Cloud).</p>
                 <div className="mt-4 p-4 bg-muted/50 rounded-lg max-w-xl mx-auto border flex flex-col md:flex-row items-center gap-6">
                     <img 
-                        src={`https://img.vietqr.io/image/TCB-8486568666-compact2.png?amount=567000&addInfo=FleetPro%20${tenantId}&accountName=TRAN%20NGOC%20CHUYEN`} 
+                        src={`https://img.vietqr.io/image/TCB-8486568666-compact2.png?amount=567000&addInfo=Phú An%20${tenantId}&accountName=TRAN%20NGOC%20CHUYEN`} 
                         alt="QR Code Thanh Toán" 
                         className="w-48 h-48 bg-white p-2 rounded-lg shadow-sm border"
                     />

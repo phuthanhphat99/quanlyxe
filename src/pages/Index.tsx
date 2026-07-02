@@ -19,7 +19,7 @@ const PLANS = [
 ];
 
 const TESTIMONIALS = [
-  { name: "Anh Nguyễn Văn Tùng", role: "Giám đốc, Cty Vận tải Hoàng Long", quote: "FleetPro giúp tôi kiểm soát 30 xe chỉ với điện thoại. Trước đây phải gọi điện từng tài xế." },
+  { name: "Anh Nguyễn Văn Tùng", role: "Giám đốc, Cty Vận tải Hoàng Long", quote: "Phú An giúp tôi kiểm soát 30 xe chỉ với điện thoại. Trước đây phải gọi điện từng tài xế." },
   { name: "Chị Trần Thị Mai", role: "Kế toán, Logistics Phú An", quote: "Chi phí nhiên liệu giảm 15% nhờ theo dõi chính xác từng chuyến. Đối soát nhanh gấp 5 lần." },
 ];
 
@@ -31,7 +31,7 @@ export default function LandingPage() {
         <div className="max-w-7xl mx-auto px-4 h-16 flex items-center justify-between">
           <div className="flex items-center gap-2">
             <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-blue-500 to-cyan-400 flex items-center justify-center font-bold text-sm">FP</div>
-            <span className="font-bold text-lg tracking-tight">FleetPro</span>
+            <span className="font-bold text-lg tracking-tight">Phú An</span>
           </div>
           <div className="flex items-center gap-2 sm:gap-3">
             <Button variant="ghost" className="text-slate-200 hover:text-white hover:bg-white/10 hidden sm:inline-flex" asChild>
@@ -59,7 +59,7 @@ export default function LandingPage() {
             tăng lợi nhuận thực
           </h1>
           <p className="text-base sm:text-xl text-slate-300 max-w-2xl mx-auto mb-8 sm:mb-10 leading-relaxed">
-            Từ 2 xe đến 200 xe — FleetPro giúp bạn kiểm soát chi phí, tối ưu doanh thu và số hóa toàn bộ quy trình vận tải chỉ trong 5 phút.
+            Từ 2 xe đến 200 xe — Phú An giúp bạn kiểm soát chi phí, tối ưu doanh thu và số hóa toàn bộ quy trình vận tải chỉ trong 5 phút.
           </p>
           <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center">
             <Button size="lg" className="bg-blue-600 hover:bg-blue-500 text-base sm:text-lg h-12 sm:h-14 px-6 sm:px-8 shadow-lg shadow-blue-500/25 font-semibold" asChild>
@@ -200,7 +200,7 @@ export default function LandingPage() {
           <div className="flex flex-col md:flex-row justify-between items-center gap-6">
             <div className="flex items-center gap-2">
               <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-blue-500 to-cyan-400 flex items-center justify-center font-bold text-sm">FP</div>
-              <span className="font-bold text-white">FleetPro</span>
+              <span className="font-bold text-white">Phú An</span>
               <span className="text-slate-400 text-sm ml-2">© 2026 TNC Solutions</span>
             </div>
             <div className="flex flex-wrap items-center justify-center gap-4 sm:gap-6 text-sm">

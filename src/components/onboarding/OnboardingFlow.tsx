@@ -39,14 +39,14 @@ export function OnboardingFlow({ tenantId, onComplete }: OnboardingFlowProps) {
   const steps: OnboardingStep[] = [
     {
       id: "welcome",
-      title: "Chào mừng đến với FleetPro",
+      title: "Chào mừng đến với Phú An",
       description: "Nền tảng logistics AI hàng đầu Việt Nam",
       icon: <TrendingUp className="w-8 h-8 text-blue-600" />,
       content: (
         <div className="space-y-6">
           <div className="text-center">
             <h2 className="text-2xl font-bold text-gray-900 mb-2">
-              Chào mừng đến với FleetPro
+              Chào mừng đến với Phú An
             </h2>
             <p className="text-gray-600">
               Nền tảng logistics AI hàng đầu Việt Nam với dữ liệu thực tế 100%
@@ -90,7 +90,7 @@ export function OnboardingFlow({ tenantId, onComplete }: OnboardingFlowProps) {
     {
       id: "demo-data",
       title: "Khám phá dữ liệu demo",
-      description: "Xem cách FleetPro tối ưu hóa logistics",
+      description: "Xem cách Phú An tối ưu hóa logistics",
       icon: <Database className="w-8 h-8 text-green-600" />,
       content: (
         <div className="space-y-6">
@@ -99,7 +99,7 @@ export function OnboardingFlow({ tenantId, onComplete }: OnboardingFlowProps) {
               Khám phá dữ liệu demo
             </h2>
             <p className="text-gray-600">
-              Xem cách FleetPro tối ưu hóa logistics với dữ liệu thực tế
+              Xem cách Phú An tối ưu hóa logistics với dữ liệu thực tế
             </p>
           </div>
 
@@ -141,7 +141,7 @@ export function OnboardingFlow({ tenantId, onComplete }: OnboardingFlowProps) {
 
           <div className="bg-green-50 p-4 rounded-lg">
             <p className="text-green-800 text-sm">
-              <strong>AI Logistics:</strong> FleetPro sử dụng trí tuệ nhân tạo để tối ưu hóa lộ trình,
+              <strong>AI Logistics:</strong> Phú An sử dụng trí tuệ nhân tạo để tối ưu hóa lộ trình,
               giảm 30% nhiên liệu và tăng 25% hiệu suất vận chuyển.
             </p>
           </div>
@@ -286,7 +286,7 @@ export function OnboardingFlow({ tenantId, onComplete }: OnboardingFlowProps) {
     {
       id: "complete",
       title: "Hoàn thành",
-      description: "Bắt đầu sử dụng FleetPro",
+      description: "Bắt đầu sử dụng Phú An",
       icon: <CheckCircle className="w-8 h-8 text-green-600" />,
       content: (
         <div className="space-y-6">
@@ -295,7 +295,7 @@ export function OnboardingFlow({ tenantId, onComplete }: OnboardingFlowProps) {
               Chúc mừng! 🎉
             </h2>
             <p className="text-gray-600">
-              Bạn đã hoàn thành thiết lập FleetPro
+              Bạn đã hoàn thành thiết lập Phú An
             </p>
           </div>
 
@@ -308,7 +308,7 @@ export function OnboardingFlow({ tenantId, onComplete }: OnboardingFlowProps) {
                     Sẵn sàng sử dụng!
                   </h3>
                   <p className="text-green-700">
-                    FleetPro đã được thiết lập với dữ liệu thực tế từ các công ty logistics hàng đầu Việt Nam.
+                    Phú An đã được thiết lập với dữ liệu thực tế từ các công ty logistics hàng đầu Việt Nam.
                   </p>
                 </div>
               </div>
@@ -343,7 +343,7 @@ export function OnboardingFlow({ tenantId, onComplete }: OnboardingFlowProps) {
 
           <div className="text-center">
             <Button size="lg" className="bg-blue-600 hover:bg-blue-700" onClick={onComplete}>
-              Bắt đầu sử dụng FleetPro
+              Bắt đầu sử dụng Phú An
               <ArrowRight className="w-4 h-4 ml-2" />
             </Button>
           </div>
@@ -378,7 +378,7 @@ export function OnboardingFlow({ tenantId, onComplete }: OnboardingFlowProps) {
       {/* Progress Bar */}
       <div className="mb-8">
         <div className="flex justify-between items-center mb-4">
-          <h1 className="text-2xl font-bold text-gray-900">Thiết lập FleetPro</h1>
+          <h1 className="text-2xl font-bold text-gray-900">Thiết lập Phú An</h1>
           <span className="text-sm text-gray-600">
             Bước {currentStep + 1} / {steps.length}
           </span>

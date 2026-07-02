@@ -91,7 +91,7 @@ export const CoachingPage: React.FC = () => {
           <div className="coach-card">
             <div className="coach-avatar">👨‍💼</div>
             <h2>Về Tư Vấn Viên</h2>
-            <p className="coach-title">Chuyên Gia Quản Lý Vận Tải - FleetPro</p>
+            <p className="coach-title">Chuyên Gia Quản Lý Vận Tải - Phú An</p>
             <p className="coach-bio">
               Với hơn 15 năm kinh nghiệm trong ngành vận tải, tôi đã giúp hơn 200 công ty
               tối ưu hóa quy trình, giảm chi phí, và tăng doanh thu. Tư vấn dựa trên kinh

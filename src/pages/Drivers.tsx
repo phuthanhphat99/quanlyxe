@@ -185,6 +185,8 @@ export default function Drivers() {
     [vehicles, dataReady]
   );
   const deleteMutation = useDeleteDriver();
+  const createMutation = useCreateDriver();
+  const updateMutation = useUpdateDriver();
 
   // Bulk Delete Hook
   const { deleteIds: deleteDrivers, isDeleting: isBulkDeleting } = useBulkDelete({
@@ -377,6 +379,10 @@ export default function Drivers() {
     } finally {
       setIsSyncing(false);
     }
+  };
+
+  const handleImport = () => {
+    setImportDialogOpen(true);
   };
 
   const handleExport = () => {

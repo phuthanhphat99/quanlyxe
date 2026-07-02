@@ -37,9 +37,9 @@ const TENANT_CONFIG = {
   },
   'internal-tenant-phuan': {
     companyName: 'Công ty TNHH Phú An',
-    adminEmail: 'admin@phuancr.com',
+    adminEmail: 'admin@phuancr.vn',
     adminName: 'Admin Phú An',
-    driverEmail: 'taixe1@phuancr.com',
+    driverEmail: 'taixe1@phuancr.vn',
   },
 };
 

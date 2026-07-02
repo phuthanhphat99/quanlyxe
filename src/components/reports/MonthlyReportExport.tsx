@@ -145,7 +145,7 @@ function generateMonthlyPdf(payload: MonthlyReportPayload) {
   doc.setFont('helvetica', 'bold');
   doc.setFontSize(14);
   doc.setTextColor(1, 105, 111);
-  doc.text('FleetPro', 14, 14);
+  doc.text('Phú An', 14, 14);
 
   doc.setFont('helvetica', 'bold');
   doc.setFontSize(15);
@@ -252,7 +252,7 @@ function generateMonthlyPdf(payload: MonthlyReportPayload) {
     doc.setFont('helvetica', 'normal');
     doc.setFontSize(8);
     doc.setTextColor(120);
-    doc.text(`Được tạo bởi FleetPro AI — ${generatedAt}`, 14, 290);
+    doc.text(`Được tạo bởi Phú An AI — ${generatedAt}`, 14, 290);
     doc.text(`Trang ${page}/${totalPages}`, 196, 290, { align: 'right' });
   }
 
@@ -410,7 +410,7 @@ export function MonthlyReportExport() {
 
     return {
       periodLabel: format(monthStart, 'MM/yyyy'),
-      companyName: pickString(companySettings as any, ['company_name'], 'FleetPro Logistics'),
+      companyName: pickString(companySettings as any, ['company_name'], 'Phú An Logistics'),
       kpi: {
         totalRevenue,
         totalCost,

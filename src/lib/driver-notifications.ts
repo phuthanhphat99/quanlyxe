@@ -64,7 +64,7 @@ export const buildDriverDispatchMessage = (payload: DriverDispatchNotificationPa
   const customerLine = payload.customerName ? `Khach: ${payload.customerName}` : 'Khach: Chua cap nhat';
 
   return [
-    'FleetPro - Chuyen moi duoc phan cong',
+    'Phú An - Chuyen moi duoc phan cong',
     '',
     `Tai xe: ${payload.driverName}`,
     `Bien so: ${payload.licensePlate}`,
@@ -75,7 +75,7 @@ export const buildDriverDispatchMessage = (payload: DriverDispatchNotificationPa
     `Ma chuyen: ${payload.tripCode}`,
     'Phan hoi: Xac nhan da nhan viec hoac tu choi.',
     '',
-    'Duoc gui boi FleetPro AI',
+    'Duoc gui boi Phú An AI',
   ].join('\n');
 };
 
@@ -92,7 +92,7 @@ export const buildDriverInteractionReportMessage = (
     .map((row, idx) => `${idx + 1}. ${row.driverName}: gui ${row.sent}, thanh cong ${row.delivered}, loi ${row.failed}`);
 
   return [
-    `FleetPro - Bao cao tuong tac tai xe (${reportDateLabel})`,
+    `Phú An - Bao cao tuong tac tai xe (${reportDateLabel})`,
     '',
     `Tong luot gui: ${totalSent}`,
     `Gui thanh cong: ${totalDelivered}`,
@@ -101,7 +101,7 @@ export const buildDriverInteractionReportMessage = (
     'Chi tiet theo tai xe:',
     ...(lines.length > 0 ? lines : ['(Khong co du lieu)']),
     '',
-    'Duoc gui boi FleetPro AI',
+    'Duoc gui boi Phú An AI',
   ].join('\n');
 };
 
@@ -358,7 +358,7 @@ export const sendDriverInteractionReportToTelegram = async (
   const viaEndpoint = await sendViaServerEndpoint(
     {
       tripCode: 'REPORT',
-      driverName: 'FleetPro',
+      driverName: 'Phú An',
       licensePlate: 'N/A',
       departureAt: new Date().toISOString(),
     },

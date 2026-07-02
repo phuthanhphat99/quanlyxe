@@ -124,7 +124,7 @@ export default function PublicTracking() {
                         <span className="text-white font-black text-xs">FP</span>
                     </div>
                     <div>
-                        <h1 className="font-bold text-sm text-slate-800">FleetPro Tracking</h1>
+                        <h1 className="font-bold text-sm text-slate-800">Phú An Tracking</h1>
                         <p className="text-[10px] text-slate-400">Tra cứu vận đơn</p>
                     </div>
                 </div>
@@ -317,7 +317,7 @@ export default function PublicTracking() {
 
                 {/* Footer */}
                 <footer className="text-center text-xs text-slate-400 pt-8 pb-4">
-                    Powered by <span className="font-bold text-slate-500">FleetPro AI</span> — Phần mềm quản lý vận tải #1 Việt Nam
+                    Powered by <span className="font-bold text-slate-500">Phú An AI</span> — Phần mềm quản lý vận tải #1 Việt Nam
                 </footer>
             </main>
         </div>

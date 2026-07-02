@@ -1,5 +1,5 @@
 /**
- * FleetPro Application Constants
+ * Phú An Application Constants
  * Centralized configuration values to avoid magic numbers scattered in code.
  */
 
@@ -79,7 +79,7 @@ export const ID_PREFIXES: Record<string, { prefix: string; padding: number }> = 
 
 // ==================== Default Company Settings ====================
 export const DEFAULT_COMPANY_SETTINGS = {
-    company_name: 'Công ty của tôi',
+    company_name: 'Công Ty TNHH Phú An',
     primary_color: '#3b82f6', // Blue
     subscription: {
         plan: 'business' as const,

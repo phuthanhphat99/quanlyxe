@@ -1,167 +1,262 @@
 import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
-import { ChevronRight, ArrowLeft } from "lucide-react";
+import { ArrowLeft } from "lucide-react";
 
 export default function PhuAnDocs() {
   return (
-    <div className="min-h-screen bg-slate-50 text-slate-900 pb-20">
-      <div className="bg-blue-900 text-white py-12 px-4 shadow-md">
-        <div className="max-w-4xl mx-auto space-y-4">
-          <Link to="/auth" className="inline-flex items-center text-blue-200 hover:text-white mb-4 transition-colors">
-            <ArrowLeft className="w-4 h-4 mr-2" /> Quay lại Đăng nhập
-          </Link>
-          <h1 className="text-3xl md:text-5xl font-bold tracking-tight">Tài Liệu Trình Diễn FleetPro 5 Sao</h1>
-          <p className="text-blue-100 text-lg md:text-xl max-w-2xl">
-            Hệ điều hành Vận tải Đám mây (Cloud SaaS Transport OS) Số 1 Việt Nam. Phiên bản đặc biệt dành cho Phú An.
-          </p>
-        </div>
-      </div>
-
-      <div className="max-w-4xl mx-auto px-4 mt-8 space-y-12">
+    <div className="min-h-screen bg-slate-50 text-slate-900 pb-20 font-[Inter]">
+      <div className="max-w-5xl mx-auto space-y-8 p-4 md:p-8">
         
-        {/* Section I */}
-        <section className="space-y-6">
-          <h2 className="text-2xl font-bold text-slate-800 border-b pb-2 border-slate-200">I. TỔNG QUAN KIẾN TRÚC PHÂN QUYỀN (THE 4-PILLARS)</h2>
-          <p className="text-slate-600">Sự khác biệt cốt lõi của FleetPro so với các phần mềm kế toán cồng kềnh là <strong>Kiến trúc Vận hành Đồng bộ Thời gian thực</strong> xoay quanh 4 vai trò nòng cốt. Thay vì nhập liệu thụ động, mọi dữ liệu tự chảy từ ngoài hiện trường vào phòng ban.</p>
-          
-          <div className="grid md:grid-cols-2 gap-6">
-            <div className="bg-white p-6 rounded-xl shadow-sm border border-slate-100 space-y-3">
-              <h3 className="text-lg font-bold text-blue-700 flex items-center gap-2">🚚 1. Tài Xế (Driver PWA)</h3>
-              <ul className="space-y-2 text-sm text-slate-700 list-disc list-inside">
-                <li><strong>1-Click Xếp Lịch:</strong> Mở điện thoại là thấy ngay Lệnh điều xe hôm nay.</li>
-                <li><strong>Biên Bản Giao Nhận (e-POD):</strong> Ký số trực tiếp trên màn hình, báo cáo tức thời.</li>
-                <li><strong>Thanh Toán Tại Trận:</strong> Chụp bill tiền trạm thu phí, bốc xếp gửi về công ty trong 3 giây.</li>
-                <li><strong>Chống Gian Lận (Anti-Fraud GPS):</strong> Bắt buộc Check-in tại tọa độ đã mã hóa. Bộ lọc tự phân tích tọa độ ảo.</li>
-              </ul>
+        {/* Header */}
+        <header className="bg-blue-900 rounded-3xl p-8 text-white shadow-xl bg-[url('https://www.transparenttextures.com/patterns/cubes.png')] relative overflow-hidden">
+          <div className="relative z-10">
+            <Link to="/auth" className="inline-flex items-center text-blue-200 hover:text-white mb-6 transition-colors font-medium">
+              <ArrowLeft className="w-4 h-4 mr-2" /> Quay lại Đăng nhập
+            </Link>
+            <br/>
+            <div className="inline-block px-4 py-1.5 bg-blue-800/80 rounded-full text-sm font-semibold mb-4 border border-blue-500/50">
+              Sổ Tay Vận Hành Phú An Thực Chiến
             </div>
-
-            <div className="bg-white p-6 rounded-xl shadow-sm border border-slate-100 space-y-3">
-              <h3 className="text-lg font-bold text-orange-600 flex items-center gap-2">👔 2. Điều Phối Viên (Dispatch)</h3>
-              <ul className="space-y-2 text-sm text-slate-700 list-disc list-inside">
-                <li><strong>Bản Đồ Cấp Bách (Live Map):</strong> Cập nhật từng mét đường di chuyển mỗi 10 giây. Không cần F5.</li>
-                <li><strong>Lịch Trình Động (Kanban):</strong> Kéo thả xe thay đổi lộ trình, tự động bơm Push Notification đến Tài xế.</li>
-              </ul>
-            </div>
-
-            <div className="bg-white p-6 rounded-xl shadow-sm border border-slate-100 space-y-3">
-              <h3 className="text-lg font-bold text-emerald-600 flex items-center gap-2">🧾 3. Kế Toán (Finance)</h3>
-              <ul className="space-y-2 text-sm text-slate-700 list-disc list-inside">
-                <li><strong>Đối Soát Thông Minh:</strong> So khớp các chi phí lặt vặt với Cước phí chuẩn Cảnh Báo Xanh/Đỏ để duyệt nhanh.</li>
-                <li><strong>Không Dữ Liệu Rác:</strong> Phiếu chi tuyệt đối phải dính với MÃ XE hoặc MÃ CHUYẾN cụ thể.</li>
-              </ul>
-            </div>
-
-            <div className="bg-white p-6 rounded-xl shadow-sm border border-slate-100 space-y-3">
-              <h3 className="text-lg font-bold text-red-600 flex items-center gap-2">👑 4. Giám Đốc (Owner)</h3>
-              <ul className="space-y-2 text-sm text-slate-700 list-disc list-inside">
-                <li><strong>Doanh Thu Triệt Để:</strong> Báo cáo Lời Lỗ nhảy theo từng chuyến hoàn thành, không đợi cuối tháng.</li>
-                <li><strong>Cách Ly An Toàn:</strong> Tính năng Multi-tenant bảo mật tuyệt đối, dữ liệu lưu trong két sắt riêng.</li>
-              </ul>
-            </div>
-          </div>
-        </section>
-
-        {/* Section II */}
-        <section className="space-y-6">
-          <h2 className="text-2xl font-bold text-slate-800 border-b pb-2 border-slate-200">II. 3 TÍNH NĂNG "WOW" KHIẾN DOANH NGHIỆP XUỐNG TIỀN</h2>
-          
-          <div className="space-y-4">
-            <div className="bg-indigo-50 border-l-4 border-indigo-500 p-4 rounded-r-lg">
-              <h3 className="font-bold text-indigo-900 text-lg">🚀 1. Luồng Sóng Radar Di Động (Live Tracking)</h3>
-              <p className="text-indigo-800 text-sm mt-1">Khi tài xế bắt đầu chuyến, một cục Radar Xanh sẽ chớp liên tục báo hiệu sóng. Quản lý nhìn qua màn hình ở nhà sẽ thấy icon tải lết đi từng bước song song với xe thật. Quản lý chủ động giám sát lộ trình không cần gọi điện giục.</p>
-            </div>
-
-            <div className="bg-fuchsia-50 border-l-4 border-fuchsia-500 p-4 rounded-r-lg">
-              <h3 className="font-bold text-fuchsia-900 text-lg">🤖 2. Trợ lý AI Xếp Chuyến (Ghép Chuyến Rỗng)</h3>
-              <p className="text-fuchsia-800 text-sm mt-1">Hệ thống gợi ý thông minh quét qua kho Tải Trọng và Điểm Đến. Từ đó đưa ra lời khuyên "Ghép chung chuyến để giảm 300K tiền dầu" hoặc "Xếp cuốc ngược về để bù đắp chi phí lết lốp rỗng".</p>
-            </div>
-
-            <div className="bg-teal-50 border-l-4 border-teal-500 p-4 rounded-r-lg">
-              <h3 className="font-bold text-teal-900 text-lg">📶 3. Tự Kháng Rớt Mạng (Offline-First)</h3>
-              <p className="text-teal-800 text-sm mt-1">Tài xế bấm hoàn thành cuốc trên đèo Hải Vân rớt sóng, App vẫn hiển thị xanh. Dữ liệu tạm thời lưu thẳng vào trình duyệt và âm thầm đẩy lên server ngay phần trăm giây đầu tiên bát sóng lại. Cảm giác mượt mà hoàn mỹ.</p>
-            </div>
-          </div>
-        </section>
-
-        {/* Section III */}
-        <section className="space-y-6">
-          <h2 className="text-2xl font-bold text-slate-800 border-b pb-2 border-slate-200">III. HƯỚNG DẪN 3 BƯỚC CHO PHÚ AN</h2>
-          <p className="text-slate-600">Với một không gian Bàn làm việc hoàn toàn sạch sẽ, Phú An hãy bắt đầu vận hành theo chuẩn 3 bước sau:</p>
-
-          <ol className="relative border-s border-slate-200 ml-3 space-y-6">                  
-            <li className="ms-6">
-                <span className="absolute flex items-center justify-center w-8 h-8 bg-blue-100 rounded-full -left-4 ring-4 ring-white text-blue-800 font-bold">1</span>
-                <h3 className="font-bold text-slate-900 text-lg mb-1">Nạp Phi Đội Thực</h3>
-                <p className="text-slate-600 text-sm">Truy cập `Quản lý Danh mục`. Nhập thông tin của 1-2 chiếc Xe thực tế thuộc sở hữu công ty, và thêm vài Tuyến đường quen thuộc.</p>
-            </li>
-            <li className="ms-6">
-                <span className="absolute flex items-center justify-center w-8 h-8 bg-orange-100 rounded-full -left-4 ring-4 ring-white text-orange-800 font-bold">2</span>
-                <h3 className="font-bold text-slate-900 text-lg mb-1">Dàn Trận Phân Việc</h3>
-                <p className="text-slate-600 text-sm">Vào trung tâm `Bản Đồ Cấp Bách`. Dùng kỹ năng kéo thả, tạo nhanh 1 lệnh vận tải giao trực tiếp cho tài khoản Tài xế của công ty.</p>
-            </li>
-            <li className="ms-6">
-                <span className="absolute flex items-center justify-center w-8 h-8 bg-emerald-100 rounded-full -left-4 ring-4 ring-white text-emerald-800 font-bold">3</span>
-                <h3 className="font-bold text-slate-900 text-lg mb-1">Mở Máy Tận Hưởng Cỗ Máy</h3>
-                <p className="text-slate-600 text-sm">Tài xế sử dụng app cập nhật liên tục mọi sự kiện trên đường. Giám đốc có thể thoải mái xem dòng tiền Lợi Nhuận tự động nhảy số cuối ngày.</p>
-            </li>
-          </ol>
-        </section>
-        
-        {/* Section IV */}
-        <section className="space-y-6">
-          <h2 className="text-2xl font-bold text-slate-800 border-b pb-2 border-slate-200">IV. ĐẶC QUYỀN GÓI ENTERPRISE (CAO CẤP NHẤT)</h2>
-          <div className="bg-gradient-to-br from-indigo-900 to-blue-800 p-6 rounded-2xl text-white shadow-xl relative overflow-hidden">
-            <div className="absolute top-0 right-0 p-4 opacity-10">
-                <Zap className="w-24 h-24" />
-            </div>
-            <h3 className="text-xl font-bold mb-4 flex items-center gap-2">💎 Phú An Premium Enterprise</h3>
-            <p className="text-blue-100 text-sm mb-6">Tài khoản Phú An đã được kích hoạt gói cao cấp nhất toàn hệ thống với các đặc quyền độc bản:</p>
+            <h1 className="text-3xl md:text-5xl font-bold mb-4">
+              Hướng Dẫn Vận Hành Hệ Thống<br/><span className="text-yellow-400">Công ty TNHH Phú An</span>
+            </h1>
+            <p className="text-blue-100 text-lg md:text-xl max-w-2xl leading-relaxed">
+              Tài liệu siêu đơn giản dành cho người dùng không rành công nghệ thao tác nhanh trên phần mềm.
+            </p>
             
-            <div className="grid sm:grid-cols-2 gap-4">
-                <div className="flex items-start gap-3 bg-white/10 p-3 rounded-lg backdrop-blur-sm">
-                    <Check className="w-5 h-5 text-emerald-400 mt-0.5" />
-                    <div>
-                        <div className="font-bold text-sm">Vô hạn số lượng Xe</div>
-                        <div className="text-xs text-blue-200">Không giới hạn quy mô đội xe.</div>
-                    </div>
-                </div>
-                <div className="flex items-start gap-3 bg-white/10 p-3 rounded-lg backdrop-blur-sm">
-                    <Check className="w-5 h-5 text-emerald-400 mt-0.5" />
-                    <div>
-                        <div className="font-bold text-sm">Vô hạn Nhân sự</div>
-                        <div className="text-xs text-blue-200">Thêm bao nhiêu tài xế & kế toán tùy ý.</div>
-                    </div>
-                </div>
-                <div className="flex items-start gap-3 bg-white/10 p-3 rounded-lg backdrop-blur-sm">
-                    <Check className="w-5 h-5 text-emerald-400 mt-0.5" />
-                    <div>
-                        <div className="font-bold text-sm">Trợ lý AI Pro</div>
-                        <div className="text-xs text-blue-200">Sử dụng mô hình AI mạnh nhất hiện nay.</div>
-                    </div>
-                </div>
-                <div className="flex items-start gap-3 bg-white/10 p-3 rounded-lg backdrop-blur-sm">
-                    <Check className="w-5 h-5 text-emerald-400 mt-0.5" />
-                    <div>
-                        <div className="font-bold text-sm">Sao lưu Google Drive</div>
-                        <div className="text-xs text-blue-200">Dữ liệu được bảo mật 2 lớp tự động.</div>
-                    </div>
-                </div>
-            </div>
-            
-            <div className="mt-8 p-4 bg-white/5 border border-white/10 rounded-xl text-xs text-blue-200 italic">
-                * Lưu ý: Mọi yêu cầu điều chỉnh cấu hình đặc thù, vui lòng liên hệ trực tiếp Super Admin (Coach Chuyen) qua kênh support riêng.
+            <div className="mt-8 p-4 bg-white/10 backdrop-blur-md rounded-xl border border-white/20 inline-block">
+              <p className="text-sm uppercase tracking-wider text-blue-200 font-semibold mb-1">Mật Khẩu Chung Cho Mọi Tài Khoản</p>
+              <p className="text-2xl font-mono font-bold tracking-widest text-yellow-300">Demo@1234</p>
             </div>
           </div>
-        </section>
+          {/* Decorative circle */}
+          <div className="absolute -bottom-24 -right-24 w-64 h-64 bg-blue-600 rounded-full mix-blend-multiply filter blur-3xl opacity-50"></div>
+        </header>
 
-        <div className="mt-12 text-center pb-8 border-t pt-8">
-            <Button size="lg" className="rounded-full shadow-lg h-14 px-8 text-lg" asChild>
-                <Link to="/auth">
-                    Trải Nghiệm Hệ Thống Ngay <ChevronRight className="ml-2 w-5 h-5" />
-                </Link>
-            </Button>
+        {/* TOC */}
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+          <a href="#taixe" className="bg-white p-4 rounded-xl shadow border-l-4 border-emerald-500 text-center font-medium hover:bg-emerald-50 transition">1. Dành cho TÀI XẾ</a>
+          <a href="#quanly" className="bg-white p-4 rounded-xl shadow border-l-4 border-blue-500 text-center font-medium hover:bg-blue-50 transition">2. Dành cho ĐIỀU PHỐI</a>
+          <a href="#ketoan" className="bg-white p-4 rounded-xl shadow border-l-4 border-purple-500 text-center font-medium hover:bg-purple-50 transition">3. Dành cho KẾ TOÁN</a>
+          <a href="#admin" className="bg-white p-4 rounded-xl shadow border-l-4 border-rose-500 text-center font-medium hover:bg-rose-50 transition">4. Dành cho GIÁM ĐỐC</a>
         </div>
 
+        {/* 1. TÀI XẾ */}
+        <section id="taixe" className="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden scroll-mt-6">
+          <div className="bg-emerald-50 p-6 border-b border-emerald-100">
+            <div className="flex items-center gap-3">
+              <div className="w-12 h-12 bg-emerald-500 rounded-full flex items-center justify-center text-white text-2xl shadow-lg shadow-emerald-500/30">🚛</div>
+              <div>
+                <h2 className="text-2xl font-bold text-emerald-900">1. Quy Trình Cho TÀI XẾ (Driver)</h2>
+                <p className="text-emerald-700">Người lái xe, báo cáo lộ trình và xác nhận đã trả hàng.</p>
+              </div>
+            </div>
+          </div>
+          <div className="p-6 md:p-8 space-y-6">
+            <div className="bg-slate-50 p-4 rounded-xl border border-slate-200">
+              <h3 className="font-bold text-slate-700 mb-2">TÀI KHOẢN ĐĂNG NHẬP:</h3>
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-2 text-sm font-mono text-emerald-700 font-bold">
+                <div className="bg-white p-2 border rounded shadow-sm text-center">taixe@phuancr.vn</div>
+              </div>
+              <p className="text-[10px] text-slate-400 mt-2 italic">* Mỗi tài khoản tương ứng với 1 xe trong đội xe Phú An.</p>
+            </div>
+
+            <div className="space-y-4">
+              <h3 className="text-lg font-bold">Thao Tác Thực Tế:</h3>
+              
+              <div className="transition-transform duration-200 hover:-translate-y-1 bg-white border-2 border-slate-100 rounded-xl p-5 shadow-sm">
+                <div className="flex gap-4">
+                  <div className="w-8 h-8 rounded-full bg-emerald-100 text-emerald-600 font-bold flex items-center justify-center shrink-0">B0</div>
+                  <div>
+                    <h4 className="font-bold text-slate-800">Gắn Xe (Nếu chưa có xe)</h4>
+                    <p className="text-slate-600 mt-1">Lần đầu đăng nhập ➔ Dashboard sẽ hiện thông báo <b className="text-amber-600">"Chưa gắn xe"</b> ➔ Bấm vào nút <b className="text-emerald-700">"Nhận Xe"</b> ➔ Chọn biển số xe bạn đang cầm lái.</p>
+                  </div>
+                </div>
+              </div>
+
+              <div className="transition-transform duration-200 hover:-translate-y-1 bg-white border-2 border-slate-100 rounded-xl p-5 shadow-sm">
+                <div className="flex gap-4">
+                  <div className="w-8 h-8 rounded-full bg-emerald-100 text-emerald-600 font-bold flex items-center justify-center shrink-0">B1</div>
+                  <div>
+                    <h4 className="font-bold text-slate-800">Tự Lập Lệnh Chạy Mới (Nếu Đang Rảnh)</h4>
+                    <p className="text-slate-600 mt-1">Đăng nhập bằng điện thoại ➔ Màn hình chính (Dashboard) ➔ Bấm vào nút màu xanh lam góc dưới tên <b className="text-blue-600">"+ Khởi tạo lệnh điều xe"</b>.</p>
+                    <p className="mt-2 text-sm text-slate-500 bg-slate-50 p-2 rounded">💡 VÍ DỤ: <br/>- Chọn đầu kéo bạn đang lái.<br/>- Nhập điểm đến: <b>"Cảng Ninh Hòa đi Kho Phú Yên"</b>.<br/>- Nhập hàng: <b>"Máy móc thiết bị"</b>.</p>
+                  </div>
+                </div>
+              </div>
+
+              <div className="transition-transform duration-200 hover:-translate-y-1 bg-white border-2 border-slate-100 rounded-xl p-5 shadow-sm">
+                <div className="flex gap-4">
+                  <div className="w-8 h-8 rounded-full bg-emerald-100 text-emerald-600 font-bold flex items-center justify-center shrink-0">B2</div>
+                  <div>
+                    <h4 className="font-bold text-slate-800">Nhận và Xác Nhận Lệnh Điều Xe từ Quản Lý</h4>
+                    <p className="text-slate-600 mt-1">Vào Menu <b>"Chuyến Đi ("Trips")</b> ➔ Thấy lệnh <b>Đã Điều Xe (Màu cam)</b> ➔ Bấm vào lệnh ➔ Trượt nút xanh <b className="text-emerald-600">"Chấp nhận Bắt đầu Lộ trình"</b>.</p>
+                  </div>
+                </div>
+              </div>
+
+              <div className="transition-transform duration-200 hover:-translate-y-1 bg-white border-2 border-slate-100 rounded-xl p-5 shadow-sm">
+                <div className="flex gap-4">
+                  <div className="w-8 h-8 rounded-full bg-emerald-100 text-emerald-600 font-bold flex items-center justify-center shrink-0">B3</div>
+                  <div>
+                    <h4 className="font-bold text-slate-800">Trả Hàng Xong - Báo Hoàn Thành</h4>
+                    <p className="text-slate-600 mt-1">Giao hàng thành công ➔ Mở lại ứng dụng ➔ Bấm vào Trip đang chạy ➔ Bấm nút <b className="text-blue-600">"Check-in Điểm Đến"</b> ➔ Ghi chú (nếu có: ví dụ "đã giao nộp đủ biên nhận cho kho") ➔ Bấm nút xanh lá <b className="text-green-600">"Hoàn Thành Chuyến"</b>.</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* 2. QUẢN LÝ */}
+        <section id="quanly" className="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden scroll-mt-6">
+          <div className="bg-blue-50 p-6 border-b border-blue-100">
+            <div className="flex items-center gap-3">
+              <div className="w-12 h-12 bg-blue-500 rounded-full flex items-center justify-center text-white text-2xl shadow-lg shadow-blue-500/30">👨‍💻</div>
+              <div>
+                <h2 className="text-2xl font-bold text-blue-900">2. Quy Trình Cho QUẢN LÝ (Điều phối viên)</h2>
+                <p className="text-blue-700">Người duyệt lệnh, ghép chuyến và bao quát trạng thái xe bãi.</p>
+              </div>
+            </div>
+          </div>
+          <div className="p-6 md:p-8 space-y-6">
+            <div className="bg-slate-50 p-4 rounded-xl border border-slate-200">
+              <h3 className="font-bold text-slate-700 mb-2">TÀI KHOẢN ĐĂNG NHẬP:</h3>
+              <div className="inline-block bg-white px-4 py-2 border rounded shadow-sm text-lg font-mono text-blue-700 font-bold">
+                quanly@phuancr.vn
+              </div>
+            </div>
+
+            <div className="space-y-4">
+              <h3 className="text-lg font-bold">Thao Tác Thực Tế:</h3>
+              
+              <div className="transition-transform duration-200 hover:-translate-y-1 bg-white border-2 border-slate-100 rounded-xl p-5 shadow-sm">
+                <div className="flex gap-4">
+                  <div className="w-8 h-8 rounded-full bg-blue-100 text-blue-600 font-bold flex items-center justify-center shrink-0">B1</div>
+                  <div>
+                    <h4 className="font-bold text-slate-800">Duyệt lệnh Nháp do Tài xế tự lập</h4>
+                    <p className="text-slate-600 mt-1">Vào menu <b>"Lịch Trình / Điều Phối" (Dispatch)</b> ➔ Bạn sẽ thấy khung các lệnh Vận tải báo trạng thái Nháp (Màu Xám) ➔ Bấm vào tên Lệnh ➔ Điền thêm Tuyến Đường Khách Hàng thật vào để App tính Giá và km ➔ Đổi trạng thái thành <b className="bg-amber-100 text-amber-800 px-2 rounded">Đã Điều Xe (Dispatched)</b>.</p>
+                  </div>
+                </div>
+              </div>
+
+              <div className="transition-transform duration-200 hover:-translate-y-1 bg-white border-2 border-slate-100 rounded-xl p-5 shadow-sm">
+                <div className="flex gap-4">
+                  <div className="w-8 h-8 rounded-full bg-blue-100 text-blue-600 font-bold flex items-center justify-center shrink-0">B2</div>
+                  <div>
+                    <h4 className="font-bold text-slate-800">Lập Tuyến Có Sẵn & Chọn Tài Xế (Nếu Công ty giao)</h4>
+                    <p className="text-slate-600 mt-1">Ở màn hình Lịch Trình, bấm nút <b className="border font-bold px-2 py-1 bg-slate-50">+ Tạo Chuyến Nhanh</b> (Góc phải trên) ➔ Chọn Xe, Tuyến Đường ví dụ <b>"Ninh Hòa đi Phú Yên"</b>, Khách hàng <b>"Nha Trang Seafood"</b> ➔ App sẽ Tự hiện số km và giá trị (ví dụ Tuyến Khứ Hồi đó &gt; 150km, tài xế sẽ nhận 1 Triệu VNĐ) ➔ Tạo Lệnh.</p>
+                  </div>
+                </div>
+              </div>
+
+              <div className="transition-transform duration-200 hover:-translate-y-1 bg-white border-2 border-slate-100 rounded-xl p-5 shadow-sm">
+                <div className="flex gap-4">
+                  <div className="w-8 h-8 rounded-full bg-blue-100 text-blue-600 font-bold flex items-center justify-center shrink-0">B3</div>
+                  <div>
+                    <h4 className="font-bold text-slate-800">Tính năng Phân Tích Kích Bản Chạy Rỗng</h4>
+                    <p className="text-slate-600 mt-1">Bấm nút <b className="text-indigo-600 font-bold">"Lọc Tuyến Tối Ưu"</b> có chữ AI ➔ Hệ thống sẽ xem xét các xe có thể gom chung tải hoặc xe trả hàng có thể bốc hàng chiều về, gợi ý để bạn Duyệt giúp Công ty tiết kiệm chi phí nhiên liệu!</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* 3. KẾ TOÁN */}
+        <section id="ketoan" className="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden scroll-mt-6">
+          <div className="bg-purple-50 p-6 border-b border-purple-100">
+            <div className="flex items-center gap-3">
+              <div className="w-12 h-12 bg-purple-500 rounded-full flex items-center justify-center text-white text-2xl shadow-lg shadow-purple-500/30">💰</div>
+              <div>
+                <h2 className="text-2xl font-bold text-purple-900">3. Quy Trình Cho KẾ TOÁN</h2>
+                <p className="text-purple-700">Người nhập khoản chi trên đường, đối chiếu, và chốt doanh thu.</p>
+              </div>
+            </div>
+          </div>
+          <div className="p-6 md:p-8 space-y-6">
+            <div className="bg-slate-50 p-4 rounded-xl border border-slate-200">
+              <h3 className="font-bold text-slate-700 mb-2">TÀI KHOẢN ĐĂNG NHẬP:</h3>
+              <div className="inline-block bg-white px-4 py-2 border rounded shadow-sm text-lg font-mono text-purple-700 font-bold">
+                ketoan@phuancr.vn
+              </div>
+            </div>
+
+            <div className="space-y-4">
+              <h3 className="text-lg font-bold">Thao Tác Thực Tế:</h3>
+              
+              <div className="transition-transform duration-200 hover:-translate-y-1 bg-white border-2 border-slate-100 rounded-xl p-5 shadow-sm">
+                <div className="flex gap-4">
+                  <div className="w-8 h-8 rounded-full bg-purple-100 text-purple-600 font-bold flex items-center justify-center shrink-0">B1</div>
+                  <div>
+                    <h4 className="font-bold text-slate-800">Nhập Liệu Phiếu Chi Trên Đường (Đổ Dầu, Vé Cầu Đường VETC)</h4>
+                    <p className="text-slate-600 mt-1">Vào menu <b>"Chi Phí & Xăng Dầu" (Expenses)</b> ➔ Bấm <b className="bg-blue-600 text-white px-2 py-0.5 rounded text-sm">+ Thêm Phiếu Chi</b>.</p>
+                    <p className="mt-2 text-sm text-slate-500 bg-slate-50 p-2 rounded">💡 VÍ DỤ: <br/>- Nhập Hạng Mục: Xăng Dầu.<br/>- Chọn biển số Xe và Tài Xế.<br/>- Nhập số tiền đúng với hóa đơn giấy mang về.<br/>- <b>Đảm bảo độ tin cậy của sổ sách 100%.</b></p>
+                  </div>
+                </div>
+              </div>
+
+              <div className="transition-transform duration-200 hover:-translate-y-1 bg-white border-2 border-slate-100 rounded-xl p-5 shadow-sm">
+                <div className="flex gap-4">
+                  <div className="w-8 h-8 rounded-full bg-purple-100 text-purple-600 font-bold flex items-center justify-center shrink-0">B2</div>
+                  <div>
+                    <h4 className="font-bold text-slate-800">Kết toán lương khoán Tài xế cuối chuyến</h4>
+                    <p className="text-slate-600 mt-1">Khi Tài Xế bấm nút hoàn thành, phần mềm đã <b className="text-green-600">tự tính Lương Mặc Định khoán:</b> 1,000,000đ cho tuyến đường khứ hồi dài qua 150km. Kế toán chỉ vào Duyệt <b>(Closed)</b> lệnh vận chuyển là xong!</p>
+                  </div>
+                </div>
+              </div>
+              
+              <div className="transition-transform duration-200 hover:-translate-y-1 bg-white border-2 border-slate-100 rounded-xl p-5 shadow-sm">
+                <div className="flex gap-4">
+                  <div className="w-8 h-8 rounded-full bg-purple-100 text-purple-600 font-bold flex items-center justify-center shrink-0">B3</div>
+                  <div>
+                    <h4 className="font-bold text-slate-800">Xuất Báo Cáo 1 Click Ký Tên Dấu</h4>
+                    <p className="text-slate-600 mt-1">Kế toán vào menu <b>"Báo cáo"</b> ở dưới cùng ➔ Bấm nút <b className="text-red-500 border border-red-500 px-2 py-0.5 rounded">Tải PDF Tổng Hợp</b> của Tháng. Báo cáo ra đủ: Biểu đồ Lãi Lỗ, Chi tiết chạy của từng biển số xe, và liệt kê từng vé dầu mua vào ngày nào ra File A4 để Mộc trình Giám Đốc đỏ!</p>
+                  </div>
+                </div>
+              </div>
+
+            </div>
+          </div>
+        </section>
+
+        {/* 4. ADMIN / GIÁM ĐỐC */}
+        <section id="admin" className="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden scroll-mt-6">
+          <div className="bg-rose-50 p-6 border-b border-rose-100">
+            <div className="flex items-center gap-3">
+              <div className="w-12 h-12 bg-rose-500 rounded-full flex items-center justify-center text-white text-2xl shadow-lg shadow-rose-500/30">👑</div>
+              <div>
+                <h2 className="text-2xl font-bold text-rose-900">4. Quy Trình Cho BAN GIÁM ĐỐC (Admin)</h2>
+                <p className="text-rose-700">Người Nắm Quyền Sát Sinh Toàn Hệ Thống - Xem Toàn Số Tổng.</p>
+              </div>
+            </div>
+          </div>
+          <div className="p-6 md:p-8 space-y-6">
+            <div className="bg-slate-50 p-4 rounded-xl border border-slate-200">
+              <h3 className="font-bold text-slate-700 mb-2">TÀI KHOẢN ĐĂNG NHẬP:</h3>
+              <div className="inline-block bg-white px-4 py-2 border rounded shadow-sm text-lg font-mono text-rose-700 font-bold">
+                admin@phuancr.vn
+              </div>
+            </div>
+
+            <div className="space-y-4">
+              <h3 className="text-lg font-bold">Đặc quyền của Admin:</h3>
+              
+              <ul className="list-disc list-inside space-y-3 text-slate-700">
+                <li><b className="text-rose-600">Thấy hết mọi ngóc ngách:</b> Mở web lên ở Trình Duyệt máy tính để xem tối ưu nhất.</li>
+                <li><b>Màn Hình Dashboard "Thực Chiến":</b> Xem trực tiếp số liệu từ hàng trăm chuyến đi trải dài trong tháng, giúp phân tích Tỉ suất lợi tức Gross Margin tức thì.</li>
+                <li><b>Quản Lý Data Phú An:</b> Chỉ người được gọi là Admin (Giám Đốc / Điều Hành) mới có thể vào tạo danh sách các đầu Xe mới, và Khai báo Tuyến Đường mới khi kí hợp đồng thêm cho công ty Phú An. (Menu: Danh Mục).</li>
+                <li><b className="text-blue-600 italic">Tính năng Elite:</b> AI gợi ý cắt giảm chi phí nhiên liệu dựa trên lịch sử chạy của các tài xế trong tháng qua.</li>
+              </ul>
+            </div>
+          </div>
+        </section>
+
+        {/* Footer */}
+        <footer className="bg-slate-900 text-slate-400 p-8 text-center rounded-2xl">
+          <p className="font-medium text-white mb-2">Chúc Quý Công ty Phú An triển khai hệ thống thành công!</p>
+          <p className="text-sm">Tài liệu trực quan được thiết kế để thao tác phần mềm Phú An dễ dàng nhất.</p>
+        </footer>
       </div>
     </div>
   );

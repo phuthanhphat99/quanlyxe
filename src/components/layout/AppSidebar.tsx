@@ -130,7 +130,7 @@ export function AppSidebar({ onNavigate }: AppSidebarProps) {
   const { toast } = useToast();
   const { role } = useAuth();
   const { data: companySettings } = useCompanySettings();
-  const guideUrl = "https://tnc.io.vn/docs/huong-dan-phu-an/";
+  const guideUrl = "/docs/huong-dan-phu-an";
   const videoUrl = import.meta.env.VITE_SUPPORT_VIDEO_URL || "";
   const hasVideoUrl = videoUrl.trim().length > 0;
 
@@ -164,13 +164,13 @@ export function AppSidebar({ onNavigate }: AppSidebarProps) {
             {companySettings?.logo_url ? (
               <img src={companySettings.logo_url} alt="Logo" className="w-full h-full object-cover" />
             ) : (
-              <Truck className="w-4 h-4" />
+              <img src="https://phuancr.vn/wp-content/uploads/elementor/thumbs/1-e1678956345924-q3lbepkogbtgw5xmilfvsrwtqt69lf6qojpdfl9p8o.png" alt="Phú An Logo" className="w-full h-full object-contain p-1 bg-white" />
             )}
           </div>
           {!collapsed && (
             <div className="animate-fade-in min-w-0">
               <h1 className="text-[13px] font-bold text-sidebar-foreground leading-tight line-clamp-2">
-                {companySettings?.company_name || "FleetPro"}
+                {companySettings?.company_name || "Công Ty TNHH Phú An"}
               </h1>
             </div>
           )}

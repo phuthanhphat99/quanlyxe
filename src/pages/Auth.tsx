@@ -13,76 +13,37 @@ import { useAuth } from "@/contexts/AuthContext";
 import { dataAdapter } from "@/lib/data-adapter";
 
 const getDemoAccounts = () => {
-    const isPhuAn = typeof window !== 'undefined' && window.location.hostname.includes('phuan.tnc.io.vn');
-    
-    if (isPhuAn) {
-        return [
-            { 
-                role: "👑 Admin Phú An", 
-                email: "admin@phuancr.com", 
-                password: "Demo@1234", 
-                color: "text-red-500",
-                description: "Quản lý toàn bộ hệ thống Phú An",
-                badge: "Full Access"
-            },
-            { 
-                role: "👔 Quản lý Phú An", 
-                email: "quanly@phuancr.com", 
-                password: "Demo@1234", 
-                color: "text-orange-500",
-                description: "Điều phối xe & chuyến đi Phú An",
-                badge: "Dispatch"
-            },
-            { 
-                role: "🧾 Kế toán Phú An", 
-                email: "ketoan@phuancr.com", 
-                password: "Demo@1234", 
-                color: "text-emerald-500",
-                description: "Chi phí & báo cáo tài chính Phú An",
-                badge: "Finance"
-            },
-            { 
-                role: "🚚 Tài xế P.A", 
-                email: "taixe1@phuancr.com", 
-                password: "Demo@1234", 
-                color: "text-blue-500",
-                description: "Giao diện di động (PWA)",
-                badge: "Mobile"
-            },
-        ];
-    }
-    
     return [
         { 
-            role: "👑 Admin", 
-            email: "admindemo@tnc.io.vn", 
+            role: "👑 Admin Phú An", 
+            email: "admin@phuancr.vn", 
             password: "Demo@1234", 
             color: "text-red-500",
-            description: "Quản lý toàn bộ hệ thống",
-            badge: "Full Access"
+            description: "Quản trị toàn quyền",
+            badge: "Admin"
         },
         { 
             role: "👔 Quản lý", 
-            email: "quanlydemo@tnc.io.vn", 
+            email: "quanly@phuancr.vn", 
             password: "Demo@1234", 
             color: "text-orange-500",
-            description: "Điều phối xe & chuyến đi",
+            description: "Điều phối xe & tài xế",
             badge: "Dispatch"
         },
         { 
             role: "🧾 Kế toán", 
-            email: "ketoandemo@tnc.io.vn", 
+            email: "ketoan@phuancr.vn", 
             password: "Demo@1234", 
             color: "text-emerald-500",
-            description: "Chi phí & báo cáo tài chính",
+            description: "Quản lý thu chi",
             badge: "Finance"
         },
         { 
-            role: "🚚 Tài xế", 
-            email: "taixedemo@tnc.io.vn", 
+            role: "🚚 Tài xế 1", 
+            email: "taixe1@phuancr.vn", 
             password: "Demo@1234", 
             color: "text-blue-500",
-            description: "Giao diện di động (PWA)",
+            description: "App tài xế (Ví dụ xe 1)",
             badge: "Mobile"
         },
     ];
@@ -320,7 +281,7 @@ export default function Auth() {
                             email: email.toLowerCase(),
                             password: password,
                             full_name: "Super Admin Coach",
-                            company_name: "FleetPro Systems"
+                            company_name: "Phú An Systems"
                         });
                         
                         if (regResult.success) {
@@ -478,9 +439,9 @@ export default function Auth() {
                                 <Truck className="w-12 h-12 text-primary" />
                             </div>
                         </div>
-                        <CardTitle className="text-2xl font-black text-slate-800 tracking-tight">FleetPro Online</CardTitle>
+                        <CardTitle className="text-2xl font-black text-slate-800 tracking-tight">Công Ty TNHH Phú An</CardTitle>
                         <CardDescription className="text-slate-500 font-medium">
-                            Quản lý vận tải thông minh - Tiêu chuẩn Enterprise SaaS
+                            Hệ Thống Quản Lý Vận Tải Nội Bộ Doanh Nghiệp
                         </CardDescription>
                     </CardHeader>
                     
@@ -496,7 +457,7 @@ export default function Auth() {
                                 <div className="mb-4 rounded-xl border border-primary/30 bg-gradient-to-r from-primary/10 to-blue-50 p-3">
                                     <div className="text-xs font-bold text-slate-800 mb-3 flex items-center gap-2">
                                         <Key className="w-3 h-3 text-primary" />
-                                        ⚡ Trải nghiệm nhanh (1 chạm) - {typeof window !== 'undefined' && window.location.hostname.includes('phuan') ? `Dữ liệu thật Phú An` : `Gói PRO cao cấp`}
+                                        ⚡ Đăng nhập một chạm - Tài khoản nội bộ Phú An
                                     </div>
                                     <div className="grid grid-cols-2 gap-2">
                                         {getDemoAccounts().map((acc, idx) => (

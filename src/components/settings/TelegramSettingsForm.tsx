@@ -118,7 +118,7 @@ export function TelegramSettingsForm() {
 
     setIsTesting(true);
     try {
-      const text = `🚀 FleetPro Security Audit - Test Connection\n\n✅ Tenant: ${tenantId}\n🔒 Encryption: Active\n⏰ Time: ${new Date().toLocaleString("vi-VN")}\n\nThông báo này xác nhận Bot riêng của khách hàng đã kết nối thành công.`;
+      const text = `🚀 Phú An Security Audit - Test Connection\n\n✅ Tenant: ${tenantId}\n🔒 Encryption: Active\n⏰ Time: ${new Date().toLocaleString("vi-VN")}\n\nThông báo này xác nhận Bot riêng của khách hàng đã kết nối thành công.`;
 
       const response = await fetch(
         `https://api.telegram.org/bot${token}/sendMessage`,
@@ -232,7 +232,7 @@ export function TelegramSettingsForm() {
               </div>
             </div>
             <p className="text-xs text-muted-foreground">
-              Để trống nếu muốn dùng bot chung mặc định của hệ thống FleetPro.
+              Để trống nếu muốn dùng bot chung mặc định của hệ thống Phú An.
               Nếu muốn bot riêng, tạo bot mới tại{" "}
               <a
                 href="https://t.me/BotFather"

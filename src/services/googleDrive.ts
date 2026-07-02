@@ -1,4 +1,4 @@
-// Google Drive API Service for FleetPro
+// Google Drive API Service for Phú An
 // Handles authentication, file upload/download, and synchronization using modern GIS (Google Identity Services)
 
 declare global {
@@ -233,7 +233,7 @@ class GoogleDriveService {
       let targetFolderId = customFolderId;
 
       if (!targetFolderId) {
-        const folderName = `FleetPro-${tenantId}`;
+        const folderName = `Phú An-${tenantId}`;
         const folderResult = await this.createFolder(folderName);
         if (folderResult.success) {
           targetFolderId = folderResult.fileId;

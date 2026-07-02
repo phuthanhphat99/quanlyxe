@@ -61,15 +61,13 @@ export const useCompanySettings = () => {
         // Save the default document asynchronously
         companySettingsAdapter.create(settings).catch(console.error);
       }
-      // AUTO-UPGRADE FOR PHU AN: Force enterprise plan for consistency
-      if (tenantId === 'internal-tenant-phuan' || (settings?.company_name || '').toLowerCase().includes('phú an')) {
-          if (settings) {
-              settings.subscription = {
-                  ...settings.subscription,
-                  plan: 'enterprise',
-                  status: 'active'
-              };
-          }
+      // AUTO-UPGRADE: Force enterprise plan for this dedicated deployment
+      if (settings) {
+          settings.subscription = {
+              ...settings.subscription,
+              plan: 'enterprise',
+              status: 'active'
+          };
       }
 
       return settings as CompanySettings;
