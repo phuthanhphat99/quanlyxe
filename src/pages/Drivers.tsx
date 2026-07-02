@@ -322,6 +322,7 @@ export default function Drivers() {
       setDeleteDialogOpen(false);
       setSelectedDriver(null);
     } catch (error) {
+      console.error('Failed to delete driver:', error);
     }
   };
 

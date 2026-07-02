@@ -1376,8 +1376,8 @@ export default function Expenses() {
           let vehicleId = null;
           if (ocrData.vehicle_plate && vehicles) {
             const v = vehicles.find((v: any) => 
-              v.license_plate?.replace(/[\s\-\.]/g, '').toLowerCase().includes(
-                ocrData.vehicle_plate!.replace(/[\s\-\.]/g, '').toLowerCase()
+              v.license_plate?.replace(/[\s\-.]/g, '').toLowerCase().includes(
+                ocrData.vehicle_plate!.replace(/[\s\-.]/g, '').toLowerCase()
               )
             );
             vehicleId = v?.id || null;

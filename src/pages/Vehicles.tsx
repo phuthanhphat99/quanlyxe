@@ -250,7 +250,7 @@ export default function Vehicles() {
       const plan = (companySettings.subscription.plan || 'trial').toLowerCase();
       const currentCount = vehicles?.length || 0;
       
-      let limit = PLAN_LIMITS[plan]?.vehicles ?? 5;
+      const limit = PLAN_LIMITS[plan]?.vehicles ?? 5;
       
       if (currentCount >= limit) {
         toast({

@@ -19,11 +19,6 @@ export function AppLayout({ children }: AppLayoutProps) {
   const location = useLocation();
   const { role } = useAuth();
 
-  // If driver accesses the main app layout, force redirect them to their PWA
-  if (normalizeUserRole(role) === 'driver') {
-      return <Navigate to="/driver" replace />;
-  }
-
   // UI mode follows viewport to keep desktop UX stable on touch-capable laptops.
   const useMobileShell = viewportWidth < 1024;
 
@@ -43,7 +38,13 @@ export function AppLayout({ children }: AppLayoutProps) {
     }
   }, [useMobileShell, mobileSidebarOpen]);
 
+  // If driver accesses the main app layout, force redirect them to their PWA
+  if (normalizeUserRole(role) === 'driver') {
+      return <Navigate to="/driver" replace />;
+  }
+
   const closeMobileSidebar = () => setMobileSidebarOpen(false);
+
 
   return (
     <PaywallGuard>

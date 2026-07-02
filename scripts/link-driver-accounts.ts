@@ -16,13 +16,14 @@
 import { initializeApp, cert, getApps } from 'firebase-admin/app';
 import { getFirestore } from 'firebase-admin/firestore';
 import { getAuth } from 'firebase-admin/auth';
+import * as fs from 'fs';
 
 // Initialize Firebase Admin
 if (!getApps().length) {
     initializeApp({
         credential: cert(
             process.env.GOOGLE_APPLICATION_CREDENTIALS 
-                ? require(process.env.GOOGLE_APPLICATION_CREDENTIALS)
+                ? JSON.parse(fs.readFileSync(process.env.GOOGLE_APPLICATION_CREDENTIALS, 'utf8'))
                 : undefined as any
         ),
     });

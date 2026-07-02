@@ -378,7 +378,9 @@ export const usePurgeData = () => {
       try {
         const storedUser = localStorage.getItem('fleetpro_user');
         if (storedUser) activeTenantId = JSON.parse(storedUser).tenantId || activeTenantId;
-      } catch (e) {}
+      } catch (e) {
+        console.warn('Could not parse stored user', e);
+      }
 
       const res = await dataAdapter.purgeAllData({ 
         tenantId: activeTenantId, 
