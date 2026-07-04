@@ -271,6 +271,7 @@ export const AlertSchema = z.object({
 
 export const CompanySettingsSchema = z.object({
   company_name: z.string().min(1, { message: 'Tên công ty là bắt buộc' }).optional(),
+  strict_nd10_audit: z.boolean().default(true).optional(),
   subscription: z.object({
     plan: z.enum(['trial', 'professional', 'business', 'enterprise']).optional(),
     status: z.string().optional(),

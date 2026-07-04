@@ -81,6 +81,7 @@ export const ID_PREFIXES: Record<string, { prefix: string; padding: number }> = 
 export const DEFAULT_COMPANY_SETTINGS = {
     company_name: 'Công Ty TNHH Phú An',
     primary_color: '#3b82f6', // Blue
+    strict_nd10_audit: true,
     subscription: {
         plan: 'business' as const,
         status: 'active' as const,

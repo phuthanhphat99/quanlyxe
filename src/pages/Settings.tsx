@@ -49,6 +49,7 @@ import { AISettingsForm } from "@/components/settings/AISettingsForm";
 import { GDriveSettingsForm } from "@/components/settings/GDriveSettingsForm";
 import { DataOwnershipExportCard } from "@/components/settings/DataOwnershipExportCard";
 import { TelegramSettingsForm } from "@/components/settings/TelegramSettingsForm";
+import { GoogleSheetsSyncCard } from "@/components/settings/GoogleSheetsSyncCard";
 
 export default function Settings() {
   const { toast } = useToast();
@@ -89,7 +90,7 @@ export default function Settings() {
 
   const [companyForm, setCompanyForm] = useState({
     company_name: '', tax_code: '', address: '', phone: '', email: '', website: '',
-    logo_url: '', primary_color: '#3b82f6'
+    logo_url: '', primary_color: '#3b82f6', strict_nd10_audit: true
   });
 
   const [secForm, setSecForm] = useState({
@@ -112,7 +113,8 @@ export default function Settings() {
         email: companySettings.email || '',
         website: companySettings.website || '',
         logo_url: companySettings.logo_url || '',
-        primary_color: companySettings.primary_color || '#3b82f6'
+        primary_color: companySettings.primary_color || '#3b82f6',
+        strict_nd10_audit: companySettings.strict_nd10_audit !== false
       });
     }
   }, [companySettings]);
@@ -207,6 +209,21 @@ export default function Settings() {
                   <Input value={companyForm.phone} onChange={(e) => setCompanyForm(s => ({ ...s, phone: e.target.value }))} />
                 </div>
               </div>
+
+              <div className="pt-4 border-t mt-4">
+                <h4 className="text-sm font-semibold mb-4">Quy định Vận hành</h4>
+                <div className="flex items-center justify-between bg-muted/30 p-3 rounded-lg border">
+                  <div className="space-y-0.5">
+                    <Label className="text-base text-blue-700 font-medium">Bật Chế Độ Chuẩn NĐ10 / TT99</Label>
+                    <p className="text-sm text-muted-foreground">Khi tắt, hệ thống chỉ cảnh báo 1 lần khi tài xế/xe hết hạn (nhưng vẫn cho phép giao chuyến).</p>
+                  </div>
+                  <Switch 
+                    checked={companyForm.strict_nd10_audit} 
+                    onCheckedChange={v => setCompanyForm(s => ({...s, strict_nd10_audit: v}))} 
+                  />
+                </div>
+              </div>
+
               <div className="flex justify-end pt-4">
                 <Button onClick={() => companySave.mutate(companyForm)} disabled={companySave.isLoading}>
                    <RefreshCw className={`w-4 h-4 mr-2 ${companySave.isLoading ? 'animate-spin' : ''}`} />
@@ -291,6 +308,7 @@ export default function Settings() {
 
         <TabsContent value="data" className="space-y-6">
            <DataOwnershipExportCard />
+           <GoogleSheetsSyncCard />
 
            {role === 'admin' && (
              <Card className="border-blue-200 bg-blue-50/40">

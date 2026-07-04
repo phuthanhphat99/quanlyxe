@@ -23,6 +23,7 @@ import {
 } from '@/components/ui/select';
 import { Checkbox } from '@/components/ui/checkbox';
 import { useToast } from '@/hooks/use-toast';
+import { useCompanySettings } from '@/hooks/useCompanySettings';
 import { useCreateTrip, useTrips } from '@/hooks/useTrips';
 import { useVehicles } from '@/hooks/useVehicles';
 import { useDrivers } from '@/hooks/useDrivers';
@@ -59,6 +60,7 @@ export function QuickTripModal({
   const { data: routes = [] } = useRoutes();
   const { data: customers = [] } = useCustomers();
   const { data: trips = [] } = useTrips();
+  const { data: companySettings } = useCompanySettings();
   const createTrip = useCreateTrip();
 
   const [internalOpen, setInternalOpen] = useState(false);
@@ -177,6 +179,20 @@ export function QuickTripModal({
     if (!routeId) return 'Vui lòng chọn tuyến đường.';
     if (!departureAt) return 'Vui lòng chọn ngày giờ xuất phát.';
     if (!driverId) return 'Xe này chưa có tài xế phân công. Vui lòng chọn tài xế.';
+    
+    if (selectedDriver?.health_check_expiry && new Date(selectedDriver.health_check_expiry) < new Date()) {
+      const strictMode = companySettings?.strict_nd10_audit !== false;
+      if (strictMode) {
+        return `Tài xế ${selectedDriver.full_name || 'này'} đã hết hạn giấy khám sức khỏe. Không thể giao chuyến!`;
+      } else {
+        toast({
+          title: 'Cảnh báo NĐ10 (Bỏ qua)',
+          description: `Tài xế ${selectedDriver.full_name || 'này'} đã hết hạn giấy khám sức khỏe nhưng chế độ Chuẩn NĐ10 đang TẮT.`,
+          variant: 'destructive',
+        });
+      }
+    }
+    
     return null;
   };
 

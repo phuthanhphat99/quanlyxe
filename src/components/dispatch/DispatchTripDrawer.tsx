@@ -33,6 +33,7 @@ import {
     SelectValue,
 } from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
+import { useCompanySettings } from "@/hooks/useCompanySettings";
 import { useCreateTrip, useUpdateTrip, useTripsByDateRange } from "@/hooks/useTrips";
 import { useVehicles } from "@/hooks/useVehicles";
 import { useDrivers } from "@/hooks/useDrivers";
@@ -85,7 +86,9 @@ export function DispatchTripDrawer({
     const { data: drivers } = useDrivers();
     const { data: routes } = useRoutes();
     const { data: customers } = useCustomers();
+    const { data: companySettings } = useCompanySettings();
 
+    const [isPrinting, setIsPrinting] = useState(false);
     // Load Trips for Availability Check (Same Day)
     const getValidDateString = (date?: Date) => {
         try {
@@ -232,6 +235,32 @@ export function DispatchTripDrawer({
     // Handle Submit
     const onSubmit = async (data: TripFormValues) => {
         try {
+            // NĐ10: Check driver health check expiry
+            if (drivers && data.driver_id) {
+                const driver = drivers.find(d => d.id === data.driver_id);
+                if (driver && (driver as any).health_check_expiry) {
+                    const healthExpiry = new Date((driver as any).health_check_expiry);
+                    const departureDate = new Date(data.departure_date);
+                    if (healthExpiry < departureDate) {
+                        const strictMode = companySettings?.strict_nd10_audit !== false;
+                        if (strictMode) {
+                            toast({
+                                title: "Lỗi phân tài (NĐ10)",
+                                description: `Tài xế ${driver.full_name} đã hết hạn giấy khám sức khỏe. Không thể giao chuyến!`,
+                                variant: "destructive",
+                            });
+                            return;
+                        } else {
+                            toast({
+                                title: "Cảnh báo NĐ10 (Bỏ qua)",
+                                description: `Tài xế ${driver.full_name} đã hết hạn giấy khám sức khỏe nhưng chế độ Chuẩn đang TẮT.`,
+                                variant: "destructive",
+                            });
+                        }
+                    }
+                }
+            }
+
             // Check for conflicts
             if (!selectedTrip && dayTrips) {
                 const conflict = dayTrips.find(t =>
@@ -332,6 +361,7 @@ export function DispatchTripDrawer({
                                         render={({ field }) => (
                                             <FormControl>
                                                 <DatePicker
+                                                    name={field.name}
                                                     value={field.value ? parseISO(field.value) : undefined}
                                                     onChange={(date) => field.onChange(date ? format(date, 'yyyy-MM-dd') : '')}
                                                 />
