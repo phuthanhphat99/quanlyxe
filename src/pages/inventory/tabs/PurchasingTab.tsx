@@ -12,6 +12,9 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigge
 import { usePurchaseOrders, useCreatePO, useUpdatePO, useInventoryItems } from '@/hooks/useInventory';
 import { exportToExcel, exportToCSV, printTable } from '@/lib/export-utils';
 import { useToast } from '@/hooks/use-toast';
+import { DataTable, Column } from "@/components/shared/DataTable";
+import { ColumnChooser } from "@/components/vehicles/ColumnChooser";
+import { Search } from "lucide-react";
 
 export function PurchasingTab() {
   const { data: pos = [], isLoading } = usePurchaseOrders();
@@ -20,6 +23,11 @@ export function PurchasingTab() {
   const updatePO = useUpdatePO();
   const { toast } = useToast();
   
+  const [searchTerm, setSearchTerm] = useState("");
+  const [visibleColumns, setVisibleColumns] = useState<string[]>([
+    'po_code', 'vendor_name', 'order_date', 'expected_date', 'total_amount', 'status', 'notes', 'actions'
+  ]);
+
   const [isCreateModalOpen, setCreateModalOpen] = useState(false);
   const [formData, setFormData] = useState({
     po_code: '',
@@ -59,10 +67,44 @@ export function PurchasingTab() {
     switch(status) {
       case 'pending': return <Badge className="bg-amber-100 text-amber-800 border-amber-200 hover:bg-amber-200">Chờ duyệt</Badge>;
       case 'completed': return <Badge className="bg-emerald-100 text-emerald-800 border-emerald-200 hover:bg-emerald-200">Đã nhập</Badge>;
-      case 'cancelled': return <Badge className="bg-slate-100 text-slate-600 border-slate-200 hover:bg-slate-200">Đã hủy</Badge>;
+      case 'cancelled': return <Badge className="bg-rose-100 text-rose-800 border-rose-200 hover:bg-rose-200">Đã hủy</Badge>;
       default: return <Badge variant="outline">{status}</Badge>;
     }
   };
+
+  const filteredPos = React.useMemo(() => {
+    if (!searchTerm) return pos;
+    return pos.filter((p: any) => 
+      (p.po_code?.toLowerCase() || '').includes(searchTerm.toLowerCase()) ||
+      (p.vendor_name?.toLowerCase() || '').includes(searchTerm.toLowerCase())
+    );
+  }, [pos, searchTerm]);
+
+  const columns = React.useMemo<Column<any>[]>(() => [
+    { key: 'po_code', header: 'Mã PO', render: (val) => <span className="font-medium text-blue-700">{val as string}</span> },
+    { key: 'vendor_name', header: 'Nhà Cung Cấp', render: (val) => <span className="font-medium">{val as string || '---'}</span> },
+    { key: 'order_date', header: 'Ngày Đặt', render: (val) => <span className="text-muted-foreground">{val as string}</span> },
+    { key: 'expected_date', header: 'Ngày Dự Kiến', render: (val) => <span className="text-muted-foreground">{val as string || '---'}</span> },
+    { key: 'total_amount', header: 'Tổng Giá Trị', align: 'right', render: (val) => <span className="font-bold">{(val as number || 0).toLocaleString()}đ</span> },
+    { key: 'status', header: 'Trạng Thái', align: 'center', render: (val) => statusBadge(val as string) },
+    { key: 'notes', header: 'Ghi Chú', render: (val) => <span className="text-muted-foreground text-sm max-w-[200px] truncate block">{val as string || '---'}</span> },
+    { key: 'actions', header: 'Thao Tác', align: 'right', render: (_, row) => (
+      <div className="flex justify-end gap-1">
+        {row.status === 'pending' ? (
+          <>
+            <Button size="sm" variant="outline" className="h-7 px-2 text-emerald-700 border-emerald-200 hover:bg-emerald-50" onClick={() => handleStatusChange(row.id, 'completed')}>
+              <Check className="w-3 h-3 mr-1" /> Duyệt
+            </Button>
+            <Button size="sm" variant="outline" className="h-7 px-2 text-rose-700 border-rose-200 hover:bg-rose-50" onClick={() => handleStatusChange(row.id, 'cancelled')}>
+              <X className="w-3 h-3 mr-1" /> Hủy
+            </Button>
+          </>
+        ) : (
+          <span className="text-xs text-slate-400 italic">Đã xử lý</span>
+        )}
+      </div>
+    )}
+  ], []);
 
   // Export handlers
   const handleExportExcel = () => {
@@ -116,29 +158,6 @@ export function PurchasingTab() {
           <h2 className="text-xl font-semibold">Đơn Yêu Cầu Mua Sắm (PO)</h2>
           <p className="text-sm text-muted-foreground">Theo dõi và quản lý việc đặt mua vật tư từ nhà cung cấp</p>
         </div>
-        <div className="flex items-center gap-2">
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button variant="outline" className="border-slate-300 text-slate-700">
-                <FileSpreadsheet className="w-4 h-4 mr-2" /> Xuất file
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end">
-              <DropdownMenuItem onClick={handleExportExcel}>
-                <FileSpreadsheet className="w-4 h-4 mr-2 text-green-600" /> Excel (.xlsx)
-              </DropdownMenuItem>
-              <DropdownMenuItem onClick={handleExportCSV}>
-                <FileSpreadsheet className="w-4 h-4 mr-2 text-blue-600" /> CSV
-              </DropdownMenuItem>
-              <DropdownMenuItem onClick={handlePrint}>
-                <Printer className="w-4 h-4 mr-2 text-slate-600" /> In báo cáo
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
-          <Button onClick={() => setCreateModalOpen(true)} className="bg-slate-800 hover:bg-slate-900 text-white shadow-sm">
-            <PlusCircle className="w-4 h-4 mr-2" /> Tạo Yêu Cầu Mới
-          </Button>
-        </div>
       </div>
 
       {/* Summary Cards */}
@@ -163,65 +182,105 @@ export function PurchasingTab() {
         </Card>
       </div>
 
-      {/* PO Table */}
-      <Card className="shadow-sm border-slate-200 overflow-hidden">
-        <Table>
-          <TableHeader className="bg-slate-50/80">
-            <TableRow>
-              <TableHead className="w-[120px]">Mã PO</TableHead>
-              <TableHead>Nhà Cung Cấp</TableHead>
-              <TableHead>Ngày Đặt</TableHead>
-              <TableHead>Ngày Dự Kiến</TableHead>
-              <TableHead className="text-right">Tổng Giá Trị</TableHead>
-              <TableHead className="text-center">Trạng Thái</TableHead>
-              <TableHead>Ghi Chú</TableHead>
-              <TableHead className="text-right">Thao Tác</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {isLoading ? (
-              <TableRow><TableCell colSpan={8} className="text-center py-8 text-muted-foreground animate-pulse">Đang tải đơn mua sắm...</TableCell></TableRow>
-            ) : pos.length === 0 ? (
-              <TableRow>
-                <TableCell colSpan={8} className="text-center py-12">
-                  <div className="flex flex-col items-center gap-3">
-                    <div className="p-4 bg-slate-100 rounded-full"><ShoppingCart className="w-10 h-10 text-slate-400" /></div>
-                    <p className="font-medium text-slate-700">Chưa có đơn mua sắm nào</p>
-                    <p className="text-sm text-muted-foreground max-w-sm">Nhấn "Tạo Yêu Cầu Mới" để tạo đề xuất mua sắm vật tư.</p>
-                  </div>
-                </TableCell>
-              </TableRow>
-            ) : (
-              pos.map((po: any) => (
-                <TableRow key={po.id} className="hover:bg-slate-50 transition-colors">
-                  <TableCell className="font-medium text-blue-700">{po.po_code}</TableCell>
-                  <TableCell className="font-medium">{po.vendor_name || '---'}</TableCell>
-                  <TableCell className="text-muted-foreground">{po.order_date}</TableCell>
-                  <TableCell className="text-muted-foreground">{po.expected_date || '---'}</TableCell>
-                  <TableCell className="text-right font-bold">{(po.total_amount || 0).toLocaleString()}đ</TableCell>
-                  <TableCell className="text-center">{statusBadge(po.status)}</TableCell>
-                  <TableCell className="text-muted-foreground text-sm max-w-[200px] truncate">{po.notes || '---'}</TableCell>
-                  <TableCell className="text-right">
-                    {po.status === 'pending' && (
-                      <div className="flex justify-end gap-1">
-                        <Button size="sm" variant="outline" className="h-7 px-2 text-emerald-700 border-emerald-200 hover:bg-emerald-50" onClick={() => handleStatusChange(po.id, 'completed')}>
-                          <Check className="w-3 h-3 mr-1" /> Duyệt
-                        </Button>
-                        <Button size="sm" variant="outline" className="h-7 px-2 text-rose-700 border-rose-200 hover:bg-rose-50" onClick={() => handleStatusChange(po.id, 'cancelled')}>
-                          <X className="w-3 h-3 mr-1" /> Hủy
-                        </Button>
-                      </div>
-                    )}
-                    {po.status !== 'pending' && (
-                      <span className="text-xs text-slate-400 italic">Đã xử lý</span>
-                    )}
-                  </TableCell>
-                </TableRow>
-              ))
-            )}
-          </TableBody>
-        </Table>
-      </Card>
+      {/* Unified Toolbar Row */}
+      <div className="flex flex-col xl:flex-row gap-2 items-start xl:items-center justify-between bg-muted/10 p-2 rounded-lg border">
+        {/* Left Side: Search */}
+        <div className="flex flex-col sm:flex-row flex-1 w-full xl:w-auto gap-2">
+          <div className="relative w-full sm:w-64 shrink-0">
+            <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
+            <Input
+              placeholder="Tìm mã PO hoặc NCC..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="pl-8 h-9 bg-background"
+            />
+          </div>
+        </div>
+
+        {/* Right Side: Actions (Compact) */}
+        <div className="flex items-center gap-1 shrink-0 overflow-x-auto max-w-full pt-1 xl:pt-0 w-full xl:w-auto justify-end">
+          <ColumnChooser
+            columns={columns.map(c => ({ key: String(c.key), header: c.header }))}
+            visibleColumns={visibleColumns}
+            onVisibilityChange={setVisibleColumns}
+            storageKey="purchasing_tab_columns"
+            defaultRequiredKeys={['po_code', 'vendor_name']}
+          />
+
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="ghost" size="icon" className="h-8 w-8 text-slate-600">
+                <FileSpreadsheet className="w-4 h-4" />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end">
+              <DropdownMenuItem onClick={handleExportExcel}>
+                <FileSpreadsheet className="w-4 h-4 mr-2 text-green-600" /> Excel (.xlsx)
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={handleExportCSV}>
+                <FileSpreadsheet className="w-4 h-4 mr-2 text-blue-600" /> CSV
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={handlePrint}>
+                <Printer className="w-4 h-4 mr-2 text-slate-600" /> In báo cáo
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+
+          <Button size="sm" onClick={() => setCreateModalOpen(true)} className="h-8 gap-1 ml-1 bg-slate-800 hover:bg-slate-900 text-white shadow-sm">
+            <PlusCircle className="w-4 h-4 mr-1 text-white" /> Tạo Yêu Cầu Mới
+          </Button>
+        </div>
+      </div>
+
+      <div className="hidden md:block">
+        <DataTable
+          data={filteredPos}
+          columns={columns.filter(c => visibleColumns.includes(String(c.key)))}
+          hideToolbar={true}
+          isLoading={isLoading}
+        />
+      </div>
+
+      {/* Mobile Card View */}
+      <div className="md:hidden grid grid-cols-1 gap-3 pt-2">
+        {isLoading ? (
+          <div className="text-center py-8 text-muted-foreground animate-pulse">Đang tải đơn mua sắm...</div>
+        ) : filteredPos.length === 0 ? (
+          <div className="text-center py-8 text-muted-foreground border rounded-lg bg-slate-50">Không tìm thấy đơn mua sắm nào</div>
+        ) : (
+          filteredPos.map((po: any) => (
+            <div key={po.id} className="bg-white p-4 rounded-xl border shadow-sm border-slate-200">
+              <div className="flex justify-between items-start mb-3">
+                <div>
+                  <div className="font-bold text-lg text-blue-700">{po.po_code}</div>
+                  <div className="text-sm font-medium text-slate-800">{po.vendor_name || '---'}</div>
+                </div>
+                <div>{statusBadge(po.status)}</div>
+              </div>
+              <div className="flex items-center justify-between mb-3 text-sm">
+                <div>
+                  <p className="text-slate-500">Ngày đặt</p>
+                  <p className="font-medium text-slate-800">{po.order_date}</p>
+                </div>
+                <div className="text-right">
+                  <p className="text-slate-500">Tổng giá trị</p>
+                  <p className="font-bold text-slate-800 text-lg">{(po.total_amount || 0).toLocaleString()}đ</p>
+                </div>
+              </div>
+              {po.status === 'pending' && (
+                <div className="flex justify-end gap-2 pt-3 border-t mt-3">
+                  <Button size="sm" variant="outline" className="h-8 text-rose-700 border-rose-200 hover:bg-rose-50" onClick={() => handleStatusChange(po.id, 'cancelled')}>
+                    <X className="w-4 h-4 mr-1" /> Hủy
+                  </Button>
+                  <Button size="sm" variant="outline" className="h-8 text-emerald-700 border-emerald-200 hover:bg-emerald-50" onClick={() => handleStatusChange(po.id, 'completed')}>
+                    <Check className="w-4 h-4 mr-1" /> Duyệt
+                  </Button>
+                </div>
+              )}
+            </div>
+          ))
+        )}
+      </div>
 
       {/* Create PO Modal */}
       <Dialog open={isCreateModalOpen} onOpenChange={setCreateModalOpen}>

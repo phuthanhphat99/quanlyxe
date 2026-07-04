@@ -8,6 +8,9 @@ import { Badge } from "@/components/ui/badge";
 import { PlusCircle, ArrowDownToLine, ArrowUpToLine, Search, FileSpreadsheet, Printer } from "lucide-react";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { exportToExcel, exportToCSV, printTable } from '@/lib/export-utils';
+import { DataTable, Column } from "@/components/shared/DataTable";
+import { ExcelFilter } from "@/components/vehicles/ExcelFilter";
+import { ColumnChooser } from "@/components/vehicles/ColumnChooser";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -21,6 +24,10 @@ export function OperationsTab() {
   const { toast } = useToast();
 
   const [searchTerm, setSearchTerm] = useState("");
+  const [activeFilters, setActiveFilters] = useState<any>({});
+  const [visibleColumns, setVisibleColumns] = useState<string[]>([
+    'item_code', 'name', 'category', 'current_stock', 'unit', 'average_cost', 'location'
+  ]);
   
   // Modals state
   const [isAddItemModalOpen, setAddItemModalOpen] = useState(false);
@@ -115,38 +122,98 @@ export function OperationsTab() {
     });
   };
 
-  const filteredItems = items.filter(i => 
-    i.name.toLowerCase().includes(searchTerm.toLowerCase()) || 
-    i.item_code.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+  const filteredItems = React.useMemo(() => {
+    return items.filter(i => {
+      const matchSearch = (i.name?.toLowerCase() || '').includes(searchTerm.toLowerCase()) ||
+        (i.item_code?.toLowerCase() || '').includes(searchTerm.toLowerCase());
+      if (!matchSearch) return false;
+      
+      if (activeFilters.category && activeFilters.category.length > 0) {
+        if (!activeFilters.category.includes(i.category)) return false;
+      }
+      
+      if (activeFilters.stock_status && activeFilters.stock_status.length > 0) {
+        const isLow = i.current_stock < i.min_stock_level;
+        if (activeFilters.stock_status.includes('low') && !isLow) return false;
+        if (activeFilters.stock_status.includes('normal') && isLow) return false;
+      }
+
+      return true;
+    });
+  }, [items, searchTerm, activeFilters]);
+
+  const columns = React.useMemo<Column<any>[]>(() => [
+    { key: 'item_code', header: 'Mã VT' },
+    { key: 'name', header: 'Tên Vật Tư', render: (val, row) => (
+      <div className="flex items-center gap-2">
+        <span className="font-medium">{val as string}</span>
+        {row.current_stock < row.min_stock_level && (
+          <Badge variant="outline" className="bg-rose-50 text-rose-700 border-rose-200 text-[10px] leading-none py-0.5">Sắp hết</Badge>
+        )}
+      </div>
+    ) },
+    { key: 'category', header: 'Danh Mục' },
+    { key: 'current_stock', header: 'Tồn Kho', align: 'right', render: (val) => (
+      <span className="font-bold text-lg text-slate-700">{(val as number).toLocaleString()}</span>
+    ) },
+    { key: 'unit', header: 'Đơn Vị', render: (val) => <span className="text-muted-foreground">{val as string}</span> },
+    { key: 'average_cost', header: 'Đơn Giá TB', align: 'right', render: (val) => <span className="font-medium">{(val as number).toLocaleString()}đ</span> },
+    { key: 'location', header: 'Vị Trí Kho', render: (val) => <span className="text-muted-foreground">{(val as string) || '---'}</span> },
+  ], []);
 
   const selectedItem = items.find(i => i.id === transactionData.item_id);
 
   return (
     <div className="space-y-6 animate-in slide-in-from-right-2 fade-in duration-300">
-      <div className="flex flex-col sm:flex-row justify-between items-center gap-4">
-        <div className="relative w-full sm:w-80 shadow-sm">
-          <Search className="absolute left-3 top-2.5 h-4 w-4 text-slate-500" />
-          <Input 
-            placeholder="Tìm mã hoặc tên vật tư..." 
-            className="pl-9 bg-white"
-            value={searchTerm}
-            onChange={e => setSearchTerm(e.target.value)}
-          />
+      {/* Unified Toolbar Row */}
+      <div className="flex flex-col xl:flex-row gap-2 items-start xl:items-center justify-between bg-muted/10 p-2 rounded-lg border">
+        {/* Left Side: Search + Filters */}
+        <div className="flex flex-col sm:flex-row flex-1 w-full xl:w-auto gap-2">
+          <div className="relative w-full sm:w-64 shrink-0">
+            <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
+            <Input
+              placeholder="Tìm mã hoặc tên vật tư..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="pl-8 h-9 bg-background"
+            />
+          </div>
+          <div className="flex-1 overflow-x-auto pb-1 sm:pb-0">
+            <ExcelFilter
+              data={items}
+              filterConfigs={[
+                { key: 'category', label: 'Danh mục', type: 'multi-select', options: Array.from(new Set(items.map(i => i.category))).map(c => ({ label: c as string, value: c as string })) },
+                { key: 'stock_status', label: 'Tồn kho', type: 'multi-select', options: [{ label: 'Đang đủ', value: 'normal' }, { label: 'Sắp hết', value: 'low' }] },
+              ]}
+              activeFilters={activeFilters}
+              onFilterChange={setActiveFilters}
+            />
+          </div>
         </div>
-        
-        <div className="flex items-center gap-2">
-          <Button onClick={() => setImportModalOpen(true)} className="bg-emerald-600 hover:bg-emerald-700 text-white shadow-sm">
+
+        {/* Right Side: Actions (Compact) */}
+        <div className="flex items-center gap-1 shrink-0 overflow-x-auto max-w-full pt-1 xl:pt-0 w-full xl:w-auto justify-end">
+          <Button size="sm" onClick={() => setImportModalOpen(true)} className="bg-emerald-600 hover:bg-emerald-700 text-white h-8 px-3 shadow-sm">
             <ArrowDownToLine className="w-4 h-4 mr-2" /> Nhập Kho
           </Button>
-          <Button onClick={() => setExportModalOpen(true)} className="bg-rose-600 hover:bg-rose-700 text-white shadow-sm">
+          <Button size="sm" onClick={() => setExportModalOpen(true)} className="bg-rose-600 hover:bg-rose-700 text-white h-8 px-3 shadow-sm">
             <ArrowUpToLine className="w-4 h-4 mr-2" /> Xuất Kho
           </Button>
-          <div className="w-px h-8 bg-slate-200 mx-1"></div>
+
+          <div className="w-px h-6 bg-border mx-1" />
+          
+          <ColumnChooser
+            columns={columns.map(c => ({ key: String(c.key), header: c.header }))}
+            visibleColumns={visibleColumns}
+            onVisibilityChange={setVisibleColumns}
+            storageKey="operations_tab_columns"
+            defaultRequiredKeys={['item_code', 'name']}
+          />
+
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Button variant="outline" className="border-slate-300 text-slate-600">
-                <FileSpreadsheet className="w-4 h-4 mr-2" /> Xuất file
+              <Button variant="ghost" size="icon" className="h-8 w-8 text-slate-600">
+                <FileSpreadsheet className="w-4 h-4" />
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
@@ -172,51 +239,57 @@ export function OperationsTab() {
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
-          <Button onClick={() => setAddItemModalOpen(true)} variant="outline" className="text-slate-700 shadow-sm border-slate-300">
-            <PlusCircle className="w-4 h-4 mr-2 text-slate-500" /> Tạo Mã Vật Tư
+
+          <Button size="sm" onClick={() => setAddItemModalOpen(true)} className="h-8 gap-1 ml-1" variant="outline">
+            <PlusCircle className="w-4 h-4 mr-1 text-slate-500" />
+            Tạo Mã Vật Tư
           </Button>
         </div>
       </div>
 
-      <Card className="shadow-sm border-slate-200 overflow-hidden">
-        <Table>
-          <TableHeader className="bg-slate-50/80">
-            <TableRow>
-              <TableHead className="w-[120px]">Mã VT</TableHead>
-              <TableHead>Tên Vật Tư</TableHead>
-              <TableHead>Danh Mục</TableHead>
-              <TableHead className="text-right">Tồn Kho</TableHead>
-              <TableHead>Đơn Vị</TableHead>
-              <TableHead className="text-right">Đơn Giá TB</TableHead>
-              <TableHead>Vị Trí Kho</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {isLoading ? (
-              <TableRow><TableCell colSpan={7} className="text-center py-8 text-muted-foreground animate-pulse">Đang tải danh mục vật tư...</TableCell></TableRow>
-            ) : filteredItems.length === 0 ? (
-              <TableRow><TableCell colSpan={7} className="text-center py-8 text-muted-foreground">Không tìm thấy vật tư nào.</TableCell></TableRow>
-            ) : (
-              filteredItems.map(item => (
-                <TableRow key={item.id} className="hover:bg-slate-50 transition-colors">
-                  <TableCell className="font-medium text-slate-700">{item.item_code}</TableCell>
-                  <TableCell className="font-medium">
-                    {item.name}
-                    {item.current_stock < item.min_stock_level && (
-                      <Badge variant="outline" className="ml-2 bg-rose-50 text-rose-700 border-rose-200 text-[10px] leading-none py-0.5">Sắp hết</Badge>
-                    )}
-                  </TableCell>
-                  <TableCell>{item.category}</TableCell>
-                  <TableCell className="text-right font-bold text-lg text-slate-700">{item.current_stock}</TableCell>
-                  <TableCell className="text-muted-foreground">{item.unit}</TableCell>
-                  <TableCell className="text-right font-medium">{item.average_cost.toLocaleString()}đ</TableCell>
-                  <TableCell className="text-muted-foreground">{item.location || '---'}</TableCell>
-                </TableRow>
-              ))
-            )}
-          </TableBody>
-        </Table>
-      </Card>
+      <div className="hidden md:block">
+        <DataTable
+          data={filteredItems}
+          columns={columns.filter(c => visibleColumns.includes(String(c.key)))}
+          hideToolbar={true}
+          isLoading={isLoading}
+        />
+      </div>
+
+      {/* Mobile Card View */}
+      <div className="md:hidden grid grid-cols-1 gap-3 pt-2">
+        {isLoading ? (
+          <div className="text-center py-8 text-muted-foreground animate-pulse">Đang tải danh mục vật tư...</div>
+        ) : filteredItems.length === 0 ? (
+          <div className="text-center py-8 text-muted-foreground border rounded-lg bg-slate-50">Không tìm thấy vật tư phù hợp</div>
+        ) : (
+          filteredItems.map(item => (
+            <div key={item.id} className="bg-white p-4 rounded-xl border shadow-sm border-slate-200">
+              <div className="flex justify-between items-start mb-3">
+                <div>
+                  <div className="font-bold text-lg text-slate-800">{item.name}</div>
+                  <div className="text-sm font-medium text-blue-600">{item.item_code} • {item.category}</div>
+                </div>
+                {item.current_stock < item.min_stock_level ? (
+                  <div className="px-2.5 py-1 rounded-full text-xs font-semibold border bg-rose-100 text-rose-700 border-rose-200">Sắp hết</div>
+                ) : (
+                  <div className="px-2.5 py-1 rounded-full text-xs font-semibold border bg-green-100 text-green-700 border-green-200">Sẵn sàng</div>
+                )}
+              </div>
+              <div className="flex items-center gap-4 mb-3 text-sm">
+                <div>
+                  <p className="text-slate-500">Tồn kho</p>
+                  <p className="font-bold text-slate-800">{item.current_stock.toLocaleString()} {item.unit}</p>
+                </div>
+                <div>
+                  <p className="text-slate-500">Đơn giá</p>
+                  <p className="font-bold text-slate-800">{item.average_cost.toLocaleString()}đ</p>
+                </div>
+              </div>
+            </div>
+          ))
+        )}
+      </div>
 
       {/* --- MODAL: TẠO MÃ VẬT TƯ --- */}
       <Dialog open={isAddItemModalOpen} onOpenChange={setAddItemModalOpen}>

@@ -3,8 +3,8 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useTires, useUpdateTire } from '@/hooks/useInventory';
 import { useVehicles } from '@/hooks/useVehicles';
 import { Button } from "@/components/ui/button";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
+import { DataTable, Column } from "@/components/shared/DataTable";
 import { History, Wrench, PackageCheck, AlertCircle, Truck } from "lucide-react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -78,6 +78,33 @@ export function LifecycleTab() {
 
   const activeVehicles = vehicles.filter((v: any) => v.status === 'active');
 
+  const columns: Column<any>[] = [
+    { key: 'serial_number', header: 'Serial', render: (val) => <span className="font-medium text-slate-800 font-mono">{val as string}</span> },
+    { key: 'brand', header: 'Hãng', render: (val) => <span className="text-muted-foreground">{val as string || '---'}</span> },
+    { key: 'size', header: 'Kích Cỡ' },
+    { key: 'current_status', header: 'Trạng Thái', align: 'center', render: (val) => {
+      const status = val as string;
+      if (status === 'IN_STOCK') return <Badge variant="outline" className="bg-blue-50 text-blue-700">Tồn kho</Badge>;
+      if (status === 'INSTALLED') return <Badge variant="outline" className="bg-emerald-50 text-emerald-700">Gắn trên xe</Badge>;
+      if (status === 'RETREADING') return <Badge variant="outline" className="bg-amber-50 text-amber-700">Đắp lại</Badge>;
+      if (status === 'DISPOSED') return <Badge variant="outline" className="bg-slate-100 text-slate-500">Đã thanh lý</Badge>;
+      return <Badge>{status}</Badge>;
+    }},
+    { key: 'actions', header: 'Hành Động', align: 'right', render: (_, row) => {
+      if (row.current_status === 'IN_STOCK') {
+        return (
+          <Button size="sm" variant="outline" className="border-emerald-200 text-emerald-700 hover:bg-emerald-50" onClick={(e) => { e.stopPropagation(); handleOpenInstallModal(row.id); }}>
+            <Wrench className="w-3 h-3 mr-1" /> Lắp Xe
+          </Button>
+        );
+      }
+      if (row.current_status === 'INSTALLED') {
+        return <span className="text-xs text-muted-foreground">{getVehiclePlate(row.current_vehicle_id)}</span>;
+      }
+      return <Button size="sm" variant="ghost" disabled>---</Button>;
+    }},
+  ];
+
   return (
     <div className="grid grid-cols-1 md:grid-cols-3 gap-6 animate-in slide-in-from-right-2 fade-in duration-300">
       
@@ -87,54 +114,14 @@ export function LifecycleTab() {
           <CardTitle className="text-lg">Danh Sách Lốp Xe</CardTitle>
           <div className="text-xs text-muted-foreground">Chọn 1 lốp để xem vòng đời</div>
         </CardHeader>
-        <div className="max-h-[600px] overflow-y-auto">
-          <Table>
-            <TableHeader className="bg-white sticky top-0 shadow-sm z-10">
-              <TableRow>
-                <TableHead>Serial</TableHead>
-                <TableHead>Hãng</TableHead>
-                <TableHead>Kích Cỡ</TableHead>
-                <TableHead className="text-center">Trạng Thái</TableHead>
-                <TableHead className="text-right">Hành Động</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {isLoading ? (
-                <TableRow><TableCell colSpan={5} className="text-center py-8">Đang tải...</TableCell></TableRow>
-              ) : tires.length === 0 ? (
-                <TableRow><TableCell colSpan={5} className="text-center py-8 text-muted-foreground">Chưa có lốp nào. Hãy nhập kho lốp từ tab "Nhập / Xuất" để bắt đầu.</TableCell></TableRow>
-              ) : (
-                tires.map((t) => (
-                  <TableRow 
-                    key={t.id} 
-                    className={`cursor-pointer transition-colors ${selectedTireId === t.id ? 'bg-blue-50/80' : 'hover:bg-slate-50'}`}
-                    onClick={() => setSelectedTireId(t.id)}
-                  >
-                    <TableCell className="font-medium text-slate-800 font-mono">{t.serial_number}</TableCell>
-                    <TableCell className="text-muted-foreground">{t.brand || '---'}</TableCell>
-                    <TableCell>{t.size}</TableCell>
-                    <TableCell className="text-center">
-                      {t.current_status === 'IN_STOCK' && <Badge variant="outline" className="bg-blue-50 text-blue-700">Tồn kho</Badge>}
-                      {t.current_status === 'INSTALLED' && <Badge variant="outline" className="bg-emerald-50 text-emerald-700">Gắn trên xe</Badge>}
-                      {t.current_status === 'RETREADING' && <Badge variant="outline" className="bg-amber-50 text-amber-700">Đắp lại</Badge>}
-                      {t.current_status === 'DISPOSED' && <Badge variant="outline" className="bg-slate-100 text-slate-500">Đã thanh lý</Badge>}
-                    </TableCell>
-                    <TableCell className="text-right">
-                      {t.current_status === 'IN_STOCK' ? (
-                        <Button size="sm" variant="outline" className="border-emerald-200 text-emerald-700 hover:bg-emerald-50" onClick={(e) => { e.stopPropagation(); handleOpenInstallModal(t.id); }}>
-                          <Wrench className="w-3 h-3 mr-1" /> Lắp Xe
-                        </Button>
-                      ) : t.current_status === 'INSTALLED' ? (
-                        <span className="text-xs text-muted-foreground">{getVehiclePlate(t.current_vehicle_id)}</span>
-                      ) : (
-                        <Button size="sm" variant="ghost" disabled>---</Button>
-                      )}
-                    </TableCell>
-                  </TableRow>
-                ))
-              )}
-            </TableBody>
-          </Table>
+        <div className="max-h-[600px] overflow-y-auto border-t">
+          <DataTable
+            data={tires}
+            columns={columns}
+            hideToolbar={true}
+            isLoading={isLoading}
+            onRowClick={(row) => setSelectedTireId(row.id)}
+          />
         </div>
       </Card>
 

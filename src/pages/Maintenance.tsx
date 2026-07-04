@@ -46,9 +46,12 @@ import {
 } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/hooks/use-toast";
-import { Wrench, AlertTriangle, Loader2, Trash2, RefreshCw } from "lucide-react";
+import { Wrench, AlertTriangle, Loader2, Trash2, RefreshCw, Search, Download, Upload, Plus, Calendar, MapPin, Truck } from "lucide-react";
 import { useMaintenanceOrders, useCreateMaintenanceOrder, useUpdateMaintenanceOrder, useDeleteMaintenanceOrder } from "@/hooks/useMaintenance";
 import { useVehicles, useVehiclesByStatus } from "@/hooks/useVehicles";
+import { ExcelFilter } from "@/components/vehicles/ExcelFilter";
+import { ColumnChooser } from "@/components/vehicles/ColumnChooser";
+import { cn } from "@/lib/utils";
 import { useQueryClient } from "@tanstack/react-query";
 import { usePermissions } from "@/hooks/usePermissions";
 import { useAuth } from "@/hooks/use-auth";
@@ -138,6 +141,10 @@ export default function Maintenance() {
   const [isSyncing, setIsSyncing] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const [importDialogOpen, setImportDialogOpen] = useState(false);
+  
+  const [activeFilters, setActiveFilters] = useState<any>({});
+  const [visibleColumns, setVisibleColumns] = useState<string[]>(['order_code', 'vehicle', 'maintenance_type', 'scheduled_date', 'total_cost', 'status']);
+
 
   // Admin override reason state
   const [adminReasonDialogOpen, setAdminReasonDialogOpen] = useState(false);
@@ -471,16 +478,30 @@ export default function Maintenance() {
     });
   };
 
-  // Filter data based on search query
-  const filteredOrders = (orders || []).filter(order => {
-    if (!searchQuery) return true;
-    const query = searchQuery.toLowerCase();
-    return (
-      order.order_code?.toLowerCase().includes(query) ||
-      order.vehicle?.license_plate?.toLowerCase().includes(query) ||
-      order.maintenance_type?.toLowerCase().includes(query)
-    );
-  });
+  // Filter data based on search query and active filters
+  const filteredOrders = useMemo(() => {
+    return (orders || []).filter(order => {
+      // 1. Search Query
+      if (searchQuery) {
+        const query = searchQuery.toLowerCase();
+        const matchesSearch = 
+          order.order_code?.toLowerCase().includes(query) ||
+          order.vehicle?.license_plate?.toLowerCase().includes(query) ||
+          order.maintenance_type?.toLowerCase().includes(query);
+        if (!matchesSearch) return false;
+      }
+
+      // 2. Excel Filters
+      if (activeFilters.maintenance_type && activeFilters.maintenance_type.length > 0) {
+        if (!activeFilters.maintenance_type.includes(order.maintenance_type)) return false;
+      }
+      if (activeFilters.status && activeFilters.status.length > 0) {
+        if (!activeFilters.status.includes(order.status)) return false;
+      }
+
+      return true;
+    });
+  }, [orders, searchQuery, activeFilters]);
 
   const scheduledCount = orders?.filter(o => o.status === 'scheduled').length || 0;
   const totalCost = orders?.reduce((sum, o) => sum + (o.total_cost || 0), 0) || 0;
@@ -554,35 +575,182 @@ export default function Maintenance() {
   }
 
   return (
-    <div className="space-y-6 animate-fade-in">
-      <PageHeader
-        title="Bảo Trì – Sửa Chữa"
-        description={`${scheduledCount} lệnh đang chờ thực hiện • Tổng chi phí: ${formatCurrency(totalCost)}`}
-        actions={
-          scheduledCount > 0 && (
-            <div className="flex items-center gap-2 px-3 py-1.5 bg-warning/10 text-warning rounded-lg text-sm">
-              <AlertTriangle className="w-4 h-4" />
-              {scheduledCount} lệnh sắp đến hạn
-            </div>
-          )
-        }
-      />
+    <div className="space-y-2 animate-fade-in">
+      {/* 1. Compact Header Row */}
+      <div className="flex items-center justify-between pb-2 border-b">
+        <div>
+          <h1 className="text-xl font-bold tracking-tight">Bảo Trì – Sửa Chữa</h1>
+          <p className="text-muted-foreground text-sm">{`${scheduledCount} lệnh đang chờ thực hiện • Tổng chi phí: ${formatCurrency(totalCost)}`}</p>
+        </div>
+        {scheduledCount > 0 && (
+          <div className="flex items-center gap-2 px-3 py-1.5 bg-warning/10 text-warning rounded-lg text-sm">
+            <AlertTriangle className="w-4 h-4" />
+            <span className="hidden sm:inline">{scheduledCount} lệnh sắp đến hạn</span>
+          </div>
+        )}
+      </div>
 
-      <DataTable
-        data={filteredOrders}
-        columns={columns}
-        selectable
-        searchPlaceholder="Tìm theo mã lệnh, mô tả..."
-        onAdd={canCreate ? handleAdd : undefined}
-        addLabel="Tạo lệnh bảo trì"
-        onRowClick={handleRowClick}
-        onExport={canExport ? handleExport : undefined}
-        onImport={canCreate ? handleImport : undefined}
-        onSearch={handleSearch}
-        onSync={handleSyncAll}
-        isSyncing={isSyncing}
-        onDeleteSelected={canDelete ? handleDeleteSelected : undefined}
-      />
+      {/* 2. Unified Toolbar Row */}
+      <div className="flex flex-col xl:flex-row gap-2 items-start xl:items-center justify-between bg-muted/10 p-2 rounded-lg border">
+        {/* Left Side: Search + Filters */}
+        <div className="flex flex-col sm:flex-row flex-1 w-full xl:w-auto gap-2">
+          <div className="relative w-full sm:w-64 shrink-0">
+            <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
+            <Input
+              placeholder="Tìm mã lệnh, biển số xe..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="pl-8 h-9 bg-background"
+            />
+          </div>
+
+          <div className="flex-1 overflow-x-auto pb-1 sm:pb-0">
+            <ExcelFilter
+              data={orders || []}
+              filterConfigs={[
+                { key: 'maintenance_type', label: 'Loại bảo trì', type: 'multi-select', options: Object.entries(maintenanceTypeLabels).map(([value, label]) => ({ label, value })) },
+                { key: 'status', label: 'Trạng thái', type: 'multi-select', options: [
+                  { label: 'Đã lên lịch', value: 'scheduled' },
+                  { label: 'Đang thực hiện', value: 'in_progress' },
+                  { label: 'Hoàn thành', value: 'completed' },
+                  { label: 'Đã hủy', value: 'cancelled' },
+                ]},
+              ]}
+              activeFilters={activeFilters}
+              onFilterChange={setActiveFilters}
+            />
+          </div>
+        </div>
+
+        {/* Right Side: Actions (Compact) */}
+        <div className="flex flex-wrap items-center gap-2 w-full xl:w-auto justify-end">
+          {canDelete && selectedIds.size > 0 && (
+            <Button
+              variant="destructive"
+              size="sm"
+              onClick={() => handleDeleteSelected(Array.from(selectedIds))}
+              className="h-8 gap-1 px-3 shadow-sm animate-in fade-in zoom-in-95"
+            >
+              <Trash2 className="w-4 h-4" />
+              <span className="hidden sm:inline">Xóa {selectedIds.size} lệnh</span>
+            </Button>
+          )}
+
+          <ColumnChooser
+            columns={columns.map(c => ({ key: String(c.key), header: c.header }))}
+            visibleColumns={visibleColumns}
+            onVisibilityChange={setVisibleColumns}
+            storageKey="maintenance_visible_columns"
+            defaultRequiredKeys={['order_code', 'vehicle']}
+          />
+
+          <div className="w-px h-6 bg-border mx-1 hidden sm:block" />
+
+          <Button variant="ghost" size="icon" onClick={handleSyncAll} disabled={isSyncing} title="Đồng bộ" className="h-8 w-8">
+            <RefreshCw className={cn("w-4 h-4", isSyncing && "animate-spin")} />
+          </Button>
+
+          {canCreate && (
+            <Button variant="outline" size="sm" onClick={handleImport} className="h-8 px-2 sm:px-3">
+              <Upload className="w-4 h-4 sm:mr-2" />
+              <span className="hidden sm:inline">Nhập</span>
+            </Button>
+          )}
+
+          {canExport && (
+            <Button variant="outline" size="sm" onClick={handleExport} className="h-8 px-2 sm:px-3">
+              <Download className="w-4 h-4 sm:mr-2" />
+              <span className="hidden sm:inline">Xuất</span>
+            </Button>
+          )}
+
+          {canCreate && (
+            <Button size="sm" onClick={handleAdd} className="h-8 gap-1 px-2 sm:px-3">
+              <Plus className="w-4 h-4 sm:mr-1" />
+              <span className="hidden sm:inline">Tạo lệnh</span>
+            </Button>
+          )}
+        </div>
+      </div>
+
+      <div className="hidden md:block">
+        <DataTable
+          data={filteredOrders}
+          columns={columns.filter(c => visibleColumns.includes(String(c.key)))}
+          selectable
+          onRowClick={handleRowClick}
+          selectedRowIds={selectedIds}
+          onSelectionChange={(ids) => setSelectedIds(new Set(ids))}
+          onDeleteSelected={canDelete ? handleDeleteSelected : undefined}
+          hideToolbar={true}
+        />
+      </div>
+
+      {/* Mobile Card View */}
+      <div className="md:hidden grid grid-cols-1 gap-3 pt-2">
+        {filteredOrders.length === 0 ? (
+          <div className="text-center py-8 text-muted-foreground border rounded-lg bg-slate-50">Không tìm thấy lệnh bảo trì phù hợp</div>
+        ) : (
+          filteredOrders.map(order => (
+            <div 
+              key={order.id} 
+              className="bg-white p-4 rounded-xl border shadow-sm border-slate-200 active:bg-slate-50 transition-colors"
+              onClick={() => handleRowClick(order)}
+            >
+              <div className="flex justify-between items-start mb-3">
+                <div>
+                  <div className="font-bold text-lg text-slate-800">{order.vehicle?.license_plate || 'N/A'}</div>
+                  <div className="text-sm font-medium text-blue-600">{order.order_code} • {maintenanceTypeLabels[order.maintenance_type] || order.maintenance_type}</div>
+                </div>
+                <div className={`px-2.5 py-1 rounded-full text-xs font-semibold border ${
+                  order.status === 'completed' ? 'bg-green-100 text-green-700 border-green-200' :
+                  order.status === 'in_progress' ? 'bg-blue-100 text-blue-700 border-blue-200' :
+                  order.status === 'cancelled' ? 'bg-red-100 text-red-700 border-red-200' :
+                  'bg-amber-100 text-amber-700 border-amber-200'
+                }`}>
+                  {order.status === 'completed' ? 'Hoàn thành' : 
+                   order.status === 'in_progress' ? 'Đang làm' : 
+                   order.status === 'cancelled' ? 'Đã hủy' : 'Đã lên lịch'}
+                </div>
+              </div>
+              
+              <div className="flex items-center gap-1 text-sm text-slate-500 mb-2">
+                <Calendar className="w-3.5 h-3.5" /> 
+                <span>Dự kiến: {formatDate(order.scheduled_date)}</span>
+              </div>
+              <div className="flex items-center gap-1 text-sm text-slate-500 mb-3 line-clamp-1">
+                <Wrench className="w-3.5 h-3.5" /> 
+                <span>{order.description}</span>
+              </div>
+              
+              <div className="flex gap-2">
+                {order.status !== 'completed' && order.status !== 'cancelled' && (
+                  <Button 
+                    size="sm" 
+                    className="w-full bg-blue-600 hover:bg-blue-700 shadow-sm" 
+                    onClick={(e) => { 
+                      e.stopPropagation();
+                      handleRowClick(order);
+                    }}
+                  >
+                    Cập nhật
+                  </Button>
+                )}
+                {canDelete && (
+                  <Button 
+                    size="sm" 
+                    variant="outline" 
+                    className="px-3 border-red-200 text-red-600 hover:bg-red-50"
+                    onClick={(e) => handleDeleteClick(e, order)}
+                  >
+                    <Trash2 className="w-4 h-4" />
+                  </Button>
+                )}
+              </div>
+            </div>
+          ))
+        )}
+      </div>
 
       {/* Hidden file input for import removed - replaced by ExcelImportDialog */}
       <ExcelImportDialog

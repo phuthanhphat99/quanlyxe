@@ -21,6 +21,9 @@ import {
   ExternalLink,
   CreditCard,
   ShieldCheck,
+  Box,
+  Fuel,
+  Hammer,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useState } from "react";
@@ -47,6 +50,9 @@ const roleAccessMap: Record<string, UserRole[]> = {
   "/dispatch": ["admin", "manager", "dispatcher"],
   "/maintenance": ["admin", "manager", "accountant"],
   "/inventory/tires": ["admin", "manager", "accountant"],
+  "/inventory/materials": ["admin", "manager", "accountant"],
+  "/inventory/fuel": ["admin", "manager", "accountant"],
+  "/inventory/tools": ["admin", "manager", "accountant"],
   "/reports": ["admin", "manager", "accountant"],
   "/alerts": ["admin", "manager", "dispatcher"],
   "/settings": ["admin", "superadmin"],
@@ -108,7 +114,10 @@ const navSections: NavSection[] = [
     label: "KỸ THUẬT",
     items: [
       { path: "/maintenance", label: "Bảo Trì", icon: Wrench },
-      { path: "/inventory/tires", label: "Kho & Lốp", icon: Package },
+      { path: "/inventory/tires", label: "Kho Lốp", icon: Package },
+      { path: "/inventory/materials", label: "Kho Vật tư", icon: Box },
+      { path: "/inventory/fuel", label: "Kho Nhiên liệu", icon: Fuel },
+      { path: "/inventory/tools", label: "Kho CCDC", icon: Hammer },
     ],
   },
   {
