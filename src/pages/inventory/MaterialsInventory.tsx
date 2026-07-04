@@ -127,6 +127,7 @@ export default function MaterialsInventory() {
   const totalValue = items.reduce((sum, i) => sum + (i.total_value || 0), 0);
   const lowStockItems = items.filter(i => i.current_stock < i.min_stock_level);
   const totalItems = items.length;
+  const categories = useMemo(() => Array.from(new Set(items.map(i => i.category))), [items]);
 
   // ─── MODALS ───
   const [isAddItemModalOpen, setAddItemModalOpen] = useState(false);
@@ -427,7 +428,6 @@ export default function MaterialsInventory() {
               columns={columns.filter(c => visibleColumns.includes(String(c.key)))}
               hideToolbar={true}
               isLoading={isLoading}
-              onRowClick={(item) => setSelectedItem(item)}
             />
           </div>
 
@@ -439,7 +439,7 @@ export default function MaterialsInventory() {
               <div className="text-center py-8 text-muted-foreground border rounded-lg bg-slate-50">Không tìm thấy vật tư phù hợp</div>
             ) : (
               filteredItems.map(item => (
-                <div key={item.id} className="bg-white p-4 rounded-xl border shadow-sm border-slate-200" onClick={() => setSelectedItem(item)}>
+                <div key={item.id} className="bg-white p-4 rounded-xl border shadow-sm border-slate-200">
                   <div className="flex justify-between items-start mb-3">
                     <div>
                       <div className="font-bold text-lg text-slate-800">{item.name}</div>
