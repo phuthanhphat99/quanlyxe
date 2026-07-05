@@ -93,6 +93,11 @@ interface Vehicle {
   purchase_price?: number | null;
   assignment_type?: 'fixed' | 'pool';
   is_deleted?: boolean;
+  gps_installed?: boolean;
+  gps_status?: 'active' | 'offline' | 'error';
+  dashcam_installed?: boolean;
+  dashcam_status?: 'active' | 'offline' | 'error';
+  transport_badge_expiry?: string | null;
 }
 
 // Form Schema Validation - đầy đủ 26 trường theo Excel
@@ -123,6 +128,11 @@ const vehicleSchema = z.object({
   assignment_type: z.enum(['fixed', 'pool'] as const).default('fixed'),
   status: z.enum(['active', 'maintenance', 'inactive', 'on_trip'] as const).default('active'),
   notes: z.string().optional(),
+  gps_installed: z.boolean().default(false),
+  gps_status: z.enum(['active', 'offline', 'error']).default('offline'),
+  dashcam_installed: z.boolean().default(false),
+  dashcam_status: z.enum(['active', 'offline', 'error']).default('offline'),
+  transport_badge_expiry: z.string().optional(),
 });
 
 type VehicleFormValues = z.infer<typeof vehicleSchema>;
@@ -153,7 +163,8 @@ export default function Vehicles() {
     'fuel_type', 'fuel_consumption_per_100km', 'usage_limit_years', 'engine_number', 'chassis_number',
     'insurance_purchase_date', 'insurance_expiry_date', 'insurance_civil_expiry', 'insurance_body_expiry', 'insurance_cost',
     'registration_cycle', 'registration_date', 'registration_expiry_date', 'registration_cost',
-    'current_location', 'current_odometer', 'purchase_date', 'purchase_price', 'assignment_type', 'status', 'notes', 'id'
+    'current_location', 'current_odometer', 'purchase_date', 'purchase_price', 'assignment_type', 'status', 'notes', 
+    'gps_installed', 'dashcam_installed', 'transport_badge_expiry', 'id'
   ];
   const [visibleColumns, setVisibleColumns] = useState<string[]>(allColumnKeys);
 
@@ -191,6 +202,9 @@ export default function Vehicles() {
     assignment_type: 'Loại cam kết',
     status: 'Trạng thái xe',
     notes: 'Ghi chú',
+    gps_installed: 'Có GPS',
+    dashcam_installed: 'Có Camera',
+    transport_badge_expiry: 'Hạn Phù hiệu',
   };
 
   // Hooks
@@ -240,6 +254,11 @@ export default function Vehicles() {
       purchase_price: 0,
       notes: "",
       status: "active",
+      gps_installed: false,
+      gps_status: "offline",
+      dashcam_installed: false,
+      dashcam_status: "offline",
+      transport_badge_expiry: "",
     },
   });
 
@@ -338,6 +357,11 @@ export default function Vehicles() {
       notes: vehicle.notes || "",
       status: vehicle.status || "active",
       assignment_type: (vehicle as any).assignment_type || "fixed",
+      gps_installed: (vehicle as any).gps_installed || false,
+      gps_status: (vehicle as any).gps_status || "offline",
+      dashcam_installed: (vehicle as any).dashcam_installed || false,
+      dashcam_status: (vehicle as any).dashcam_status || "offline",
+      transport_badge_expiry: (vehicle as any).transport_badge_expiry || "",
     });
     setDialogOpen(true);
   }, [form]);
@@ -722,6 +746,34 @@ export default function Vehicles() {
       width: '150px',
       align: 'right',
       render: (value) => formatCurrency(value as number),
+    },
+    {
+      key: 'gps_installed',
+      header: 'Có GPS',
+      width: '100px',
+      align: 'center',
+      render: (val, row) => val ? (
+        <span className="text-green-600 text-xs font-bold bg-green-100 px-2 py-1 rounded border border-green-200">YES ({row.gps_status === 'active' ? 'Hoạt động' : row.gps_status === 'offline' ? 'Mất tín hiệu' : 'Lỗi'})</span>
+      ) : (
+        <span className="text-gray-400 text-xs">NO</span>
+      ),
+    },
+    {
+      key: 'dashcam_installed',
+      header: 'Có Camera',
+      width: '100px',
+      align: 'center',
+      render: (val, row) => val ? (
+        <span className="text-blue-600 text-xs font-bold bg-blue-100 px-2 py-1 rounded border border-blue-200">YES ({row.dashcam_status === 'active' ? 'Hoạt động' : row.dashcam_status === 'offline' ? 'Mất tín hiệu' : 'Lỗi'})</span>
+      ) : (
+        <span className="text-gray-400 text-xs">NO</span>
+      ),
+    },
+    {
+      key: 'transport_badge_expiry',
+      header: 'Hạn Phù hiệu',
+      width: '130px',
+      render: (value) => formatDate(value as string),
     },
     {
       key: 'current_location',
@@ -1201,6 +1253,7 @@ export default function Vehicles() {
                         <FormLabel>Ngày mua bảo hiểm</FormLabel>
                         <FormControl>
                           <DatePicker
+                            name={field.name}
                             value={field.value ? parseISO(field.value) : undefined}
                             onChange={(date) => field.onChange(date ? format(date, 'yyyy-MM-dd') : '')}
                           />
@@ -1217,6 +1270,7 @@ export default function Vehicles() {
                       <FormLabel>Hạn BH Dân sự (Trách nhiệm TS) *</FormLabel>
                       <FormControl>
                           <DatePicker
+                            name={field.name}
                             value={field.value ? parseISO(field.value) : undefined}
                             onChange={(date) => field.onChange(date ? format(date, 'yyyy-MM-dd') : '')}
                           />
@@ -1233,6 +1287,7 @@ export default function Vehicles() {
                         <FormLabel>Hạn BH Thân vỏ</FormLabel>
                         <FormControl>
                           <DatePicker
+                            name={field.name}
                             value={field.value ? parseISO(field.value) : undefined}
                             onChange={(date) => field.onChange(date ? format(date, 'yyyy-MM-dd') : '')}
                           />
@@ -1290,6 +1345,7 @@ export default function Vehicles() {
                         <FormLabel>Ngày đăng kiểm</FormLabel>
                         <FormControl>
                           <DatePicker
+                            name={field.name}
                             value={field.value ? parseISO(field.value) : undefined}
                             onChange={(date) => field.onChange(date ? format(date, 'yyyy-MM-dd') : '')}
                           />
@@ -1306,6 +1362,7 @@ export default function Vehicles() {
                       <FormLabel>Ngày hết hạn đăng kiểm *</FormLabel>
                       <FormControl>
                           <DatePicker
+                            name={field.name}
                             value={field.value ? parseISO(field.value) : undefined}
                             onChange={(date) => field.onChange(date ? format(date, 'yyyy-MM-dd') : '')}
                           />
@@ -1324,6 +1381,101 @@ export default function Vehicles() {
                           <Input type="number" placeholder="VD: 500000" {...field} />
                         </FormControl>
                         <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+              </div>
+            </div>
+
+              {/* Tuân thủ & Giám sát (NĐ10/TT99) */}
+              <div className="space-y-4">
+                <h3 className="font-semibold text-sm text-blue-600 border-b border-blue-200 pb-1">Tuân thủ & Giám sát (NĐ10/TT99)</h3>
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 bg-blue-50/50 p-4 rounded-lg border border-blue-100">
+                  <FormField
+                    control={form.control}
+                    name="gps_installed"
+                    render={({ field }) => (
+                      <FormItem className="flex flex-row items-center justify-between rounded-lg border p-3 bg-white">
+                        <div className="space-y-0.5">
+                          <FormLabel>Thiết bị định vị (GPS)</FormLabel>
+                          <p className="text-[12px] text-muted-foreground">Bắt buộc NĐ10</p>
+                        </div>
+                        <FormControl>
+                          <input type="checkbox" name={field.name} checked={field.value} onChange={field.onChange} className="w-4 h-4 accent-blue-600" />
+                        </FormControl>
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={form.control}
+                    name="gps_status"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Trạng thái GPS</FormLabel>
+                        <Select onValueChange={field.onChange} value={field.value}>
+                          <FormControl>
+                            <SelectTrigger className="bg-white">
+                              <SelectValue placeholder="Chọn" />
+                            </SelectTrigger>
+                          </FormControl>
+                          <SelectContent>
+                            <SelectItem value="active">Hoạt động tốt</SelectItem>
+                            <SelectItem value="offline">Mất tín hiệu</SelectItem>
+                            <SelectItem value="error">Báo lỗi</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={form.control}
+                    name="transport_badge_expiry"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Hạn Phù hiệu VT</FormLabel>
+                        <FormControl>
+                          <DatePicker
+                            name={field.name}
+                            value={field.value ? parseISO(field.value) : undefined}
+                            onChange={(date) => field.onChange(date ? format(date, 'yyyy-MM-dd') : '')}
+                          />
+                        </FormControl>
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={form.control}
+                    name="dashcam_installed"
+                    render={({ field }) => (
+                      <FormItem className="flex flex-row items-center justify-between rounded-lg border p-3 bg-white">
+                        <div className="space-y-0.5">
+                          <FormLabel>Camera hành trình</FormLabel>
+                          <p className="text-[12px] text-muted-foreground">Bắt buộc xe khách/đầu kéo</p>
+                        </div>
+                        <FormControl>
+                          <input type="checkbox" name={field.name} checked={field.value} onChange={field.onChange} className="w-4 h-4 accent-blue-600" />
+                        </FormControl>
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={form.control}
+                    name="dashcam_status"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Trạng thái Camera</FormLabel>
+                        <Select onValueChange={field.onChange} value={field.value}>
+                          <FormControl>
+                            <SelectTrigger className="bg-white">
+                              <SelectValue placeholder="Chọn" />
+                            </SelectTrigger>
+                          </FormControl>
+                          <SelectContent>
+                            <SelectItem value="active">Truyền d/liệu tốt</SelectItem>
+                            <SelectItem value="offline">Mất tín hiệu</SelectItem>
+                            <SelectItem value="error">Hỏng/Lỗi thẻ</SelectItem>
+                          </SelectContent>
+                        </Select>
                       </FormItem>
                     )}
                   />

@@ -16,9 +16,11 @@ interface DatePickerProps {
     disabled?: boolean
     className?: string
     placeholder?: string
+    name?: string
+    id?: string
 }
 
-export function DatePicker({ value, onChange, disabled, className, placeholder = "dd/MM/yyyy" }: DatePickerProps) {
+export function DatePicker({ value, onChange, disabled, className, placeholder = "dd/MM/yyyy", name, id }: DatePickerProps) {
     const [open, setOpen] = React.useState(false)
     const [inputValue, setInputValue] = React.useState("")
 
@@ -105,6 +107,8 @@ export function DatePicker({ value, onChange, disabled, className, placeholder =
         <Popover open={open} onOpenChange={setOpen} modal={true}>
             <div className={cn("relative w-full", className)}>
                 <Input
+                    id={id}
+                    name={name}
                     type="text"
                     value={inputValue}
                     onChange={handleInputChange}

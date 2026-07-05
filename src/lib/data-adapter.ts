@@ -4,6 +4,7 @@
  */
 
 import { app, db, auth, firebaseConfig, functions } from './firebase';
+import { createD1Adapter } from './d1-adapter';
 import { 
     collection, doc, getDocs, getDoc, setDoc, updateDoc, deleteDoc, 
     query, where, addDoc, writeBatch, getCountFromServer, limit, orderBy, documentId 
@@ -79,16 +80,16 @@ export const getTenantId = () => {
             runtimeTenantId = cached;
             return cached;
         }
+        // Auto-seed default tenant ID in local/web mode if missing
+        localStorage.setItem('fleetpro_tenant_id', 'internal-tenant-1');
     }
 
     // Fallback: Try to get tenant_id from current auth user
     if (auth.currentUser) {
-        // We can't easily wait for a doc fetch here synchronously, 
-        // but we can check if it was set in a previous session.
-        return ''; 
+        return 'internal-tenant-1'; 
     }
     
-    return ''; 
+    return 'internal-tenant-1'; 
 };
 
 const US_CENTRAL1_FUNCTIONS = getFunctions(app, 'us-central1');
@@ -501,10 +502,10 @@ const enrichTripsWithRelations = async (rows: any[]) => {
     if (!rows?.length) return rows;
 
     const [vehicles, drivers, customers, routes] = await Promise.all([
-        getTenantRows('vehicles'),
-        getTenantRows('drivers'),
-        getTenantRows('customers'),
-        getTenantRows('routes'),
+        createD1Adapter('vehicles').list(200),
+        createD1Adapter('drivers').list(200),
+        createD1Adapter('customers').list(200),
+        createD1Adapter('routes').list(200),
     ]);
 
     const vehicleMap = buildIdMap(vehicles);
@@ -588,8 +589,8 @@ const enrichExpensesWithRelations = async (rows: any[]) => {
     const tripIds = rows.map(r => pickRefId(r, ['trip_id', 'tripId'])).filter(Boolean);
     
     const [vehicles, drivers, trips, categories] = await Promise.all([
-        getTenantRows('vehicles', 100), // Vehicles are few, caching them is fine
-        getTenantRows('drivers', 100),
+        createD1Adapter('vehicles').list(200), // Vehicles are few, caching them is fine
+        createD1Adapter('drivers').list(200),
         getDocsByIds('trips', tripIds),  // Optimized: Only fetch relevant trips
         getTenantRows('expenseCategories', 50),
     ]);
@@ -982,9 +983,9 @@ const createFirestoreAdapter = (collectionName: string) => ({
 });
 
 const transportOrderFirestoreAdapter = {
-    ...createFirestoreAdapter('transportOrders'),
+    ...createD1Adapter('transportOrders'),
     getStats: async () => {
-        const rows = await (createFirestoreAdapter('transportOrders') as any).list();
+        const rows = await (createD1Adapter('transportOrders') as any).list();
         const byStatus: Record<string, number> = {};
         rows.forEach((r: any) => {
             byStatus[r.status || 'unknown'] = (byStatus[r.status || 'unknown'] || 0) + 1;
@@ -1041,31 +1042,31 @@ const transportOrderFirestoreAdapter = {
 };
 
 const inventoryFirestoreAdapter = {
-    ...createFirestoreAdapter('inventory'),
-    listItems: async () => (createFirestoreAdapter('inventory') as any).list(),
-    createItem: async (data: any) => (createFirestoreAdapter('inventory') as any).create(data),
-    updateItem: async (id: string, data: any) => (createFirestoreAdapter('inventory') as any).update(id, data),
+    ...createD1Adapter('inventory'),
+    listItems: async () => (createD1Adapter('inventory') as any).list(),
+    createItem: async (data: any) => (createD1Adapter('inventory') as any).create(data),
+    updateItem: async (id: string, data: any) => (createD1Adapter('inventory') as any).update(id, data),
     listTransactions: async (itemId?: string) => {
-        const rows = await (createFirestoreAdapter('inventoryTransactions') as any).list();
+        const rows = await (createD1Adapter('inventoryTransactions') as any).list();
         return itemId ? rows.filter((r: any) => r.item_id === itemId) : rows;
     },
-    createTransaction: async (data: any) => (createFirestoreAdapter('inventoryTransactions') as any).create(data),
+    createTransaction: async (data: any) => (createD1Adapter('inventoryTransactions') as any).create(data),
     listTires: async (params?: { status?: string; vehicle_id?: string }) => {
-        let rows = await (createFirestoreAdapter('tires') as any).list();
+        let rows = await (createD1Adapter('tires') as any).list();
         if (params?.status) rows = rows.filter((r: any) => (r.current_status || r.status) === params.status);
         if (params?.vehicle_id) rows = rows.filter((r: any) => (r.current_vehicle_id || r.vehicle_id) === params.vehicle_id);
         return rows;
     },
-    createTire: async (data: any) => (createFirestoreAdapter('tires') as any).create(data),
-    updateTire: async (id: string, data: any) => (createFirestoreAdapter('tires') as any).update(id, data),
-    listPOs: async () => (createFirestoreAdapter('purchaseOrders') as any).list(),
-    createPO: async (data: any) => (createFirestoreAdapter('purchaseOrders') as any).create(data),
-    updatePO: async (id: string, data: any) => (createFirestoreAdapter('purchaseOrders') as any).update(id, data),
+    createTire: async (data: any) => (createD1Adapter('tires') as any).create(data),
+    updateTire: async (id: string, data: any) => (createD1Adapter('tires') as any).update(id, data),
+    listPOs: async () => (createD1Adapter('purchaseOrders') as any).list(),
+    createPO: async (data: any) => (createD1Adapter('purchaseOrders') as any).create(data),
+    updatePO: async (id: string, data: any) => (createD1Adapter('purchaseOrders') as any).update(id, data),
 };
 
 const tiresFirestoreAdapter = {
-    ...createFirestoreAdapter('tires'),
-    getAll: async () => (createFirestoreAdapter('tires') as any).list(),
+    ...createD1Adapter('tires'),
+    getAll: async () => (createD1Adapter('tires') as any).list(),
     install: async (tireId: string, vehicleId: string, axlePos: string, date: string, odo: number) => {
         await updateDoc(doc(db, 'tires', tireId), {
             current_status: 'INSTALLED',
@@ -1092,25 +1093,25 @@ const tiresFirestoreAdapter = {
         return true;
     },
     getInstalledOnVehicle: async (vehicleId: string) => {
-        const all = await (createFirestoreAdapter('tires') as any).list();
+        const all = await (createD1Adapter('tires') as any).list();
         return all.filter((t: any) => (t.current_vehicle_id === vehicleId) && ((t.current_status || t.status) === 'INSTALLED'));
     },
     getHistory: async (tireId: string) => {
-        const t = await (createFirestoreAdapter('tires') as any).getById(tireId);
+        const t = await (createD1Adapter('tires') as any).getById(tireId);
         return t ? [t] : [];
     },
 };
 
 // Implementation of Trips requires specific methods
 const tripFirestoreAdapter = {
-    ...createFirestoreAdapter('trips'),
+    ...createD1Adapter('trips'),
     list: async (limitCount?: number, offsetCount?: number) => {
-        const baseAdapter = createFirestoreAdapter('trips') as any;
+        const baseAdapter = createD1Adapter('trips') as any;
         const rows = await baseAdapter.list(limitCount, offsetCount);
         return enrichTripsWithRelations(rows);
     },
     getById: async (id: string) => {
-        const baseAdapter = createFirestoreAdapter('trips') as any;
+        const baseAdapter = createD1Adapter('trips') as any;
         const row = await baseAdapter.getById(id);
         if (!row) return null;
         const [enriched] = await enrichTripsWithRelations([row]);
@@ -1119,24 +1120,24 @@ const tripFirestoreAdapter = {
     // DEEP AUDIT FIX: Inherit route costs on creation + Backend Guards
     create: async (data: any) => {
         const tenantId = getTenantId();
-        const baseAdapter = createFirestoreAdapter('trips') as any;
+        const baseAdapter = createD1Adapter('trips') as any;
         
         // ===== BACKEND GUARDS (B1-B3) =====
         // Guard B1: Vehicle must be active
         if (data.vehicle_id) {
-            const vSnap = await getDoc(doc(db, 'vehicles', data.vehicle_id));
-            if (vSnap.exists() && vSnap.data()?.status !== 'active') {
-                throw new Error(`Xe ${vSnap.data()?.license_plate || data.vehicle_id} đang ở trạng thái "${vSnap.data()?.status}". Chỉ xe Active mới được điều.`);
+            const vData = await (createD1Adapter('vehicles') as any).getById(data.vehicle_id);
+            if (vData && vData.status !== 'active') {
+                throw new Error(`Xe ${vData.license_plate || data.vehicle_id} đang ở trạng thái "${vData.status}". Chỉ xe Active mới được điều.`);
             }
         }
-        // Guard B3: Driver must be active
+        // Guard B2: Driver must be active
         if (data.driver_id) {
-            const dSnap = await getDoc(doc(db, 'drivers', data.driver_id));
-            if (dSnap.exists() && dSnap.data()?.status !== 'active') {
-                throw new Error(`Tài xế ${dSnap.data()?.full_name || data.driver_id} đang ở trạng thái "${dSnap.data()?.status}". Chỉ TX Active mới được nhận lệnh.`);
+            const dData = await (createD1Adapter('drivers') as any).getById(data.driver_id);
+            if (dData && dData.status !== 'active') {
+                throw new Error(`Tài xế ${dData.full_name || data.driver_id} đang ở trạng thái "${dData.status}". Chỉ tài xế Active mới được nhận chuyến.`);
             }
         }
-        // Guard B2: Route must be active and have costs
+        // Guard B3: Route must be active and have costs
         if (data.route_id) {
             const rSnap = await getDoc(doc(db, 'routes', data.route_id));
             if (rSnap.exists()) {
@@ -1173,7 +1174,7 @@ const tripFirestoreAdapter = {
 
                     for (const std of standards) {
                         if (std.amt && std.amt > 0) {
-                            await (createFirestoreAdapter('expenses') as any).create({
+                            await (createD1Adapter('expenses') as any).create({
                                 tenant_id: tenantId,
                                 amount: std.amt,
                                 category_id: std.cat,
@@ -1481,7 +1482,7 @@ const tripFirestoreAdapter = {
 };
 
 const tripLocationFirestoreAdapter = {
-    ...createFirestoreAdapter('trip_location_logs'),
+    ...createD1Adapter('trip_location_logs'),
     listByTrip: async (tripId: string) => {
         const tenantId = getTenantId();
         const q = query(
@@ -1535,21 +1536,21 @@ const recalculateTripExpenses = async (tripId: string, tenantId: string) => {
 
 // Specialized adapter for Expenses to handle Trip recalculations
 const expenseFirestoreAdapter = {
-    ...createFirestoreAdapter('expenses'),
+    ...createD1Adapter('expenses'),
     list: async (limitCount?: number, offsetCount?: number) => {
-        const baseAdapter = createFirestoreAdapter('expenses') as any;
+        const baseAdapter = createD1Adapter('expenses') as any;
         const rows = await baseAdapter.list(limitCount, offsetCount);
         return enrichExpensesWithRelations(rows);
     },
     getById: async (id: string) => {
-        const baseAdapter = createFirestoreAdapter('expenses') as any;
+        const baseAdapter = createD1Adapter('expenses') as any;
         const row = await baseAdapter.getById(id);
         if (!row) return null;
         const [enriched] = await enrichExpensesWithRelations([row]);
         return enriched || null;
     },
     listByTrip: async (tripId: string) => {
-        const baseAdapter = createFirestoreAdapter('expenses') as any;
+        const baseAdapter = createD1Adapter('expenses') as any;
         const allRows = await baseAdapter.list();
         const normalizedTripId = String(tripId);
         const filtered = allRows.filter((row: any) => {
@@ -1560,7 +1561,7 @@ const expenseFirestoreAdapter = {
     },
     create: async (data: any) => {
         enforceMutationThrottle('expenses', 'create', undefined, data);
-        const baseAdapter = createFirestoreAdapter('expenses');
+        const baseAdapter = createD1Adapter('expenses');
         
         // ---- EXPORT LOGIC: ODOMETER SYNC ----
         const isFuelOrMaint = ['Dầu', 'Nhiên liệu', 'Bảo trì', 'Sửa chữa'].some(cat => 
@@ -1588,7 +1589,7 @@ const expenseFirestoreAdapter = {
     },
     update: async (id: string, data: any) => {
         enforceMutationThrottle('expenses', 'update', id, data);
-        const baseAdapter = createFirestoreAdapter('expenses');
+        const baseAdapter = createD1Adapter('expenses');
         const oldDoc = (await baseAdapter.get(id)) as any;
         const res = await baseAdapter.update(id, data);
         
@@ -1602,7 +1603,7 @@ const expenseFirestoreAdapter = {
     // QA AUDIT FIX 2.2: Block deletion of confirmed expenses
     delete: async (id: string) => {
         enforceMutationThrottle('expenses', 'delete', id);
-        const baseAdapter = createFirestoreAdapter('expenses');
+        const baseAdapter = createD1Adapter('expenses');
         const oldDoc = (await baseAdapter.get(id)) as any;
         if (oldDoc?.status === 'confirmed') {
             throw new Error('Không thể xóa chi phí đã xác nhận. Vui lòng hủy (cancel) chi phí trước khi xóa.');
@@ -1639,7 +1640,7 @@ const expenseFirestoreAdapter = {
 
 // Specialized adapter for Alerts that calculates on-the-fly anomalies
 const alertsFirestoreAdapter = {
-    ...createFirestoreAdapter('alerts'),
+    ...createD1Adapter('alerts'),
     getSummary: async () => {
         const tenantId = getTenantId();
         
@@ -1692,7 +1693,7 @@ const alertsFirestoreAdapter = {
             }
         });
 
-        const persistedAlerts = await (createFirestoreAdapter('alerts') as any).list();
+        const persistedAlerts = await (createD1Adapter('alerts') as any).list();
         persistedAlerts.forEach((alert: any) => {
             const severity = alert.severity === 'critical' ? 'critical' : (alert.severity === 'warning' ? 'warning' : 'info');
             if (severity === 'critical') criticalCount++;
@@ -2578,28 +2579,28 @@ const generateGetNextCode = (collectionName: string, prefix: string, codeField: 
  */
 const webDataAdapters: Record<string, any> = {
     vehicles: {
-        ...createFirestoreAdapter('vehicles'),
+        ...createD1Adapter('vehicles'),
         getNextCode: generateGetNextCode('vehicles', 'XE', 'vehicle_code'),
     },
     drivers: {
-        ...createFirestoreAdapter('drivers'),
+        ...createD1Adapter('drivers'),
         getNextCode: generateGetNextCode('drivers', 'TX', 'driver_code'),
     },
     customers: {
-        ...createFirestoreAdapter('customers'),
+        ...createD1Adapter('customers'),
         getNextCode: generateGetNextCode('customers', 'KH', 'customer_code'),
     },
     routes: {
-        ...createFirestoreAdapter('routes'),
+        ...createD1Adapter('routes'),
         getNextCode: generateGetNextCode('routes', 'TD', 'route_code'),
     },
     partners: {
-        ...createFirestoreAdapter('partners'),
+        ...createD1Adapter('partners'),
         getNextCode: generateGetNextCode('partners', 'DT', 'partner_name'), // Some use partner_name as code or just DT prefix
     },
     trips: tripFirestoreAdapter,
     expenses: expenseFirestoreAdapter,
-    maintenance: createFirestoreAdapter('maintenance'),
+    maintenance: createD1Adapter('maintenance'),
     tires: tiresFirestoreAdapter,
     inventory: inventoryFirestoreAdapter,
     tripLocationLogs: tripLocationFirestoreAdapter,
@@ -2655,9 +2656,9 @@ const webDataAdapters: Record<string, any> = {
             return snap.exists() ? [{ id: snap.id, ...snap.data() }] : [];
         }
     },
-    tripExpenses: createFirestoreAdapter('tripExpenses'),
-    expenseCategories: createFirestoreAdapter('expenseCategories'),
-    accountingPeriods: createFirestoreAdapter('accountingPeriods'),
+    tripExpenses: createD1Adapter('tripExpenses'),
+    expenseCategories: createD1Adapter('expenseCategories'),
+    accountingPeriods: createD1Adapter('accountingPeriods'),
     alerts: alertsFirestoreAdapter,
     purgeAllData,
     auth: {
@@ -3211,3 +3212,9 @@ export const dataAdapter = {
         return { success: true, count: updatedCount };
     }
 };
+
+if (typeof window !== 'undefined') {
+    (window as any).__dataAdapter = dataAdapter;
+    (window as any).__db = db;
+}
+

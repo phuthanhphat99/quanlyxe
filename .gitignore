@@ -43,3 +43,12 @@ Thumbs.db
 scratch/
 DATA-DEMO/
 .wrangler/
+# Local App Data
+.dev.vars
+fleetpro-local.db*
+d1/
+qa-screenshots/
+test-results/
+playwright-report/
+videos/
+

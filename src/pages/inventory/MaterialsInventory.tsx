@@ -405,6 +405,9 @@ export default function MaterialsInventory() {
 
             {/* Right Side: Actions (Compact) */}
             <div className="flex flex-wrap items-center gap-1 w-full xl:w-auto justify-end">
+              <Button size="sm" onClick={() => setAddItemModalOpen(true)} className="h-8 gap-1 ml-1" variant="outline">
+                <PlusCircle className="w-4 h-4" /> <span className="hidden sm:inline">Tạo Mã</span>
+              </Button>
               <Button size="sm" onClick={() => setImportModalOpen(true)} className="bg-emerald-600 hover:bg-emerald-700 text-white h-8 px-2 sm:px-3 shadow-sm">
                 <ArrowDownToLine className="w-4 h-4 sm:mr-2" /> <span className="hidden sm:inline">Nhập Kho</span>
               </Button>

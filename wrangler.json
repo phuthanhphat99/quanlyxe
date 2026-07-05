@@ -1,5 +1,13 @@
 {
   "name": "fleetpro-app",
   "compatibility_date": "2026-04-02",
-  "pages_build_output_dir": "dist"
+  "compatibility_flags": ["nodejs_compat"],
+  "pages_build_output_dir": "dist",
+  "d1_databases": [
+    {
+      "binding": "DB",
+      "database_name": "fleetpro-d1",
+      "database_id": "e7681e10-f3c2-4708-abec-05a7b3ac6b33"
+    }
+  ]
 }

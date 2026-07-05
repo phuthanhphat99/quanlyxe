@@ -76,6 +76,18 @@ const TiresInventory = lazy(() => import("./pages/inventory/TireInventory").catc
   console.error('Failed to load TiresInventory:', err);
   return { default: () => <div>Tire Inventory failed to load</div> };
 }));
+const MaterialsInventory = lazy(() => import("./pages/inventory/MaterialsInventory").catch(err => {
+  console.error('Failed to load MaterialsInventory:', err);
+  return { default: () => <div>Materials Inventory failed to load</div> };
+}));
+const FuelInventory = lazy(() => import("./pages/inventory/FuelInventory").catch(err => {
+  console.error('Failed to load FuelInventory:', err);
+  return { default: () => <div>Fuel Inventory failed to load</div> };
+}));
+const ToolsInventory = lazy(() => import("./pages/inventory/ToolsInventory").catch(err => {
+  console.error('Failed to load ToolsInventory:', err);
+  return { default: () => <div>Tools Inventory failed to load</div> };
+}));
 const NotFound = lazy(() => import("./pages/NotFound").catch(err => {
   console.error('Failed to load NotFound:', err);
   return { default: () => <div>Page not found</div> };
@@ -213,6 +225,9 @@ const App = () => {
                   <Route path="/transport-orders" element={<TransportOrders />} />
                   <Route path="/maintenance" element={<Maintenance />} />
                   <Route path="/inventory/tires" element={<TiresInventory />} />
+                  <Route path="/inventory/materials" element={<MaterialsInventory />} />
+                  <Route path="/inventory/fuel" element={<FuelInventory />} />
+                  <Route path="/inventory/tools" element={<ToolsInventory />} />
                   <Route path="/reports" element={<Reports />} />
                   <Route path="/alerts" element={<Alerts />} />
                   <Route path="/settings" element={<Settings />} />

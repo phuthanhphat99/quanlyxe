@@ -12,6 +12,7 @@ import { DriverFilter } from "@/components/drivers/DriverFilter";
 import { ExcelImportDialog, ImportColumn } from "@/components/shared/ExcelImportDialog";
 import { formatCurrency, formatDate } from "@/lib/formatters";
 import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
 import { getNextCodeByPrefix, getMonthlyPrefix } from "@/lib/code-generator";
 import { db } from "@/lib/firebase";
 import { cn } from "@/lib/utils";
@@ -949,6 +950,7 @@ export default function Drivers() {
                       <FormLabel>Ngày sinh *</FormLabel>
                       <FormControl>
                         <DatePicker
+                          name={field.name}
                           value={field.value ? parseISO(field.value) : undefined}
                           onChange={(date) => field.onChange(date ? format(date, 'yyyy-MM-dd') : '')}
                         />
@@ -994,6 +996,7 @@ export default function Drivers() {
                       <FormLabel>Ngày cấp CCCD *</FormLabel>
                       <FormControl>
                         <DatePicker
+                          name={field.name}
                           value={field.value ? parseISO(field.value) : undefined}
                           onChange={(date) => field.onChange(date ? format(date, 'yyyy-MM-dd') : '')}
                         />
@@ -1078,6 +1081,7 @@ export default function Drivers() {
                       <FormLabel>Ngày hết hạn GPLX *</FormLabel>
                       <FormControl>
                         <DatePicker
+                          name={field.name}
                           value={field.value ? new Date(field.value) : undefined}
                           onChange={(date) => field.onChange(date ? format(date, "yyyy-MM-dd") : "")}
                         />
@@ -1095,6 +1099,7 @@ export default function Drivers() {
                       <FormLabel>Hết hạn khám SK *</FormLabel>
                       <FormControl>
                         <DatePicker
+                          name={field.name}
                           value={field.value ? new Date(field.value) : undefined}
                           onChange={(date) => field.onChange(date ? format(date, "yyyy-MM-dd") : "")}
                         />
@@ -1126,6 +1131,7 @@ export default function Drivers() {
                       <FormLabel>Ngày vào làm</FormLabel>
                       <FormControl>
                         <DatePicker
+                          name={field.name}
                           value={field.value ? parseISO(field.value) : undefined}
                           onChange={(date) => field.onChange(date ? format(date, 'yyyy-MM-dd') : '')}
                         />
