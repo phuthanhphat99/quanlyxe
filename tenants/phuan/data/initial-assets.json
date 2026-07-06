@@ -1,0 +1,195 @@
+{
+  "vehicles": [
+    {
+      "license_plate": "50H-123.88",
+      "vehicle_code": "XE-PA01",
+      "vehicle_type": "Xe đầu kéo",
+      "brand": "Hyundai HD320",
+      "capacity_tons": 30,
+      "fuel_type": "Diesel",
+      "fuel_consumption_per_100km": 35,
+      "engine_number": "D6AC-888899",
+      "chassis_number": "KMHDA1700PA01",
+      "status": "active",
+      "gps_status": "active",
+      "dashcam_status": "active",
+      "current_odometer": 45000,
+      "branch_id": "BRANCH-HCM"
+    },
+    {
+      "license_plate": "51D-999.99",
+      "vehicle_code": "XE-PA02",
+      "vehicle_type": "Xe tải thùng",
+      "brand": "Hino 500 FG",
+      "capacity_tons": 8.5,
+      "fuel_type": "Diesel",
+      "fuel_consumption_per_100km": 22,
+      "engine_number": "J08E-PA0002",
+      "chassis_number": "RL8J08E00PA02",
+      "status": "active",
+      "gps_status": "active",
+      "dashcam_status": "active",
+      "current_odometer": 28000,
+      "branch_id": "BRANCH-HCM"
+    },
+    {
+      "license_plate": "51C-888.66",
+      "vehicle_code": "XE-PA03",
+      "vehicle_type": "Xe đầu kéo",
+      "brand": "Freightliner Cascadia",
+      "capacity_tons": 32,
+      "fuel_type": "Diesel",
+      "fuel_consumption_per_100km": 38,
+      "engine_number": "DD15-PA0003",
+      "chassis_number": "3AKJGLD50PA03",
+      "status": "active",
+      "gps_status": "active",
+      "dashcam_status": "active",
+      "current_odometer": 62000,
+      "branch_id": "BRANCH-BD"
+    }
+  ],
+  "drivers": [
+    {
+      "full_name": "Trần Văn Phú",
+      "driver_code": "TX-PHU01",
+      "phone": "0988111222",
+      "email": "taixe1@phuancr.vn",
+      "id_card": "079085001111",
+      "license_number": "790888999001",
+      "license_class": "FC",
+      "date_of_birth": "1984-05-15",
+      "address": "Quận 7, TP.HCM",
+      "license_expiry": "2029-12-31",
+      "health_check_expiry": "2028-06-30",
+      "base_salary": 16000000,
+      "status": "active"
+    },
+    {
+      "full_name": "Nguyễn Đức An",
+      "driver_code": "TX-AN02",
+      "phone": "0977333444",
+      "email": "taixe2@phuancr.vn",
+      "id_card": "079090002222",
+      "license_number": "790888999002",
+      "license_class": "C",
+      "date_of_birth": "1991-09-10",
+      "address": "Thủ Đức, TP.HCM",
+      "license_expiry": "2028-10-15",
+      "health_check_expiry": "2027-10-15",
+      "base_salary": 13000000,
+      "status": "active"
+    },
+    {
+      "full_name": "Lê Hoàng Hùng",
+      "driver_code": "TX-HUNG03",
+      "phone": "0933555777",
+      "email": "taixe3@phuancr.vn",
+      "id_card": "079088003333",
+      "license_number": "790888999003",
+      "license_class": "FC",
+      "date_of_birth": "1988-11-20",
+      "address": "Dĩ An, Bình Dương",
+      "license_expiry": "2030-05-30",
+      "health_check_expiry": "2028-11-30",
+      "base_salary": 16500000,
+      "status": "active"
+    }
+  ],
+  "customers": [
+    {
+      "customer_code": "KH-THEP01",
+      "company_name": "Công ty CP Thép Phú An",
+      "tax_code": "0312345678",
+      "address": "KCN Sóng Thần 2, Dĩ An, Bình Dương",
+      "contact_person": "Anh Hùng - Trưởng phòng Vật tư",
+      "phone": "02833334444",
+      "email": "logistics@thepphuan.vn",
+      "customer_type": "doanh_nghiep",
+      "status": "active",
+      "debt_limit": 1000000000
+    },
+    {
+      "customer_code": "KH-HOAPHAT",
+      "company_name": "Tập Đoàn Thép Hòa Phát (Chi Nhánh Miền Nam)",
+      "tax_code": "0900183865",
+      "address": "KCN Phú Mỹ II, Bà Rịa - Vũng Tàu",
+      "contact_person": "Chị Lan - Điều vận Kho",
+      "phone": "02543888999",
+      "email": "logistics.mn@hoaphat.com.vn",
+      "customer_type": "doanh_nghiep",
+      "status": "active",
+      "debt_limit": 2000000000
+    },
+    {
+      "customer_code": "KH-VINAMILK",
+      "company_name": "Công ty CP Sữa Việt Nam (Vinamilk - Mega Factory)",
+      "tax_code": "0300588569",
+      "address": "KCN Mỹ Phước 2, Bến Cát, Bình Dương",
+      "contact_person": "Anh Tuấn - Giám đốc Kho vận",
+      "phone": "02743555666",
+      "email": "transport@vinamilk.com.vn",
+      "customer_type": "doanh_nghiep",
+      "status": "active",
+      "debt_limit": 3000000000
+    }
+  ],
+  "routes": [
+    {
+      "route_code": "TD-HCMCM",
+      "route_name": "TP.HCM ➔ Cảng Cái Mép (Vũng Tàu)",
+      "origin": "ICD Phước Long, TP.HCM",
+      "destination": "Cảng Cái Mép - Thị Vải, Phú Mỹ, Bà Rịa - Vũng Tàu",
+      "distance_km": 85,
+      "standard_freight_rate": 4500000,
+      "toll_cost": 240000,
+      "driver_allowance": 300000,
+      "fuel_cost_standard": 1200000,
+      "status": "active"
+    },
+    {
+      "route_code": "TD-BDCATLAI",
+      "route_name": "KCN Sóng Thần (Bình Dương) ➔ Cảng Cát Lái (TP.HCM)",
+      "origin": "KCN Sóng Thần 2, Dĩ An, Bình Dương",
+      "destination": "Cảng Tân Cảng - Cát Lái, TP Thủ Đức, TP.HCM",
+      "distance_km": 35,
+      "standard_freight_rate": 2800000,
+      "toll_cost": 120000,
+      "driver_allowance": 200000,
+      "fuel_cost_standard": 550000,
+      "status": "active"
+    },
+    {
+      "route_code": "TD-HCMHN",
+      "route_name": "TP.HCM ➔ Hà Nội (Tuyến Bắc - Nam)",
+      "origin": "Kho Tổng Sóng Thần, Bình Dương",
+      "destination": "KCN Quang Minh, Mê Linh, Hà Nội",
+      "distance_km": 1720,
+      "standard_freight_rate": 35000000,
+      "toll_cost": 3200000,
+      "driver_allowance": 2500000,
+      "fuel_cost_standard": 14500000,
+      "status": "active"
+    }
+  ],
+  "sample_orders": [
+    {
+      "order_code": "DH-PA2026-01",
+      "customer_code": "KH-THEP01",
+      "route_code": "TD-HCMCM",
+      "cargo_description": "Thép cuộn xây dựng Hòa Phát - 25 tấn",
+      "weight_tons": 25,
+      "total_amount": 4500000,
+      "status": "confirmed"
+    },
+    {
+      "order_code": "DH-PA2026-02",
+      "customer_code": "KH-VINAMILK",
+      "route_code": "TD-BDCATLAI",
+      "cargo_description": "Sữa bột Vinamilk Dielac - 8 container",
+      "weight_tons": 18,
+      "total_amount": 2800000,
+      "status": "confirmed"
+    }
+  ]
+}

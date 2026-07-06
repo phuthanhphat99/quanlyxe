@@ -1,0 +1,51 @@
+{
+  "tenant_id": "internal-tenant-phuan",
+  "project_id": "quanlyxe-phuan",
+  "company_info": {
+    "company_name": "Công ty TNHH Phú An (Phú An Logistics)",
+    "company_code": "PHUAN",
+    "tax_code": "0312345678",
+    "address": "KCN Sóng Thần 2, Dĩ An, Bình Dương",
+    "phone": "02833334444",
+    "email": "contact@phuancr.vn",
+    "website": "https://phuancr.vn",
+    "logo_url": "https://phuancr.vn/wp-content/uploads/elementor/thumbs/1-e1678956345924-q3lbepkogbtgw5xmilfvsrwtqt69lf6qojpdfl9p8o.png"
+  },
+  "admin_accounts": [
+    {
+      "email": "admin@phuancr.vn",
+      "name": "Giám Đốc Phú An",
+      "role": "admin",
+      "phone": "0988000111"
+    },
+    {
+      "email": "quanly@phuancr.vn",
+      "name": "Trưởng Phòng Vận Tải",
+      "role": "manager",
+      "phone": "0988000222"
+    },
+    {
+      "email": "ketoan@phuancr.vn",
+      "name": "Kế Toán Trưởng Phú An",
+      "role": "accountant",
+      "phone": "0988000333"
+    }
+  ],
+  "settings": {
+    "default_debt_limit": 500000000,
+    "currency": "VND",
+    "timezone": "Asia/Ho_Chi_Minh",
+    "date_format": "DD/MM/YYYY",
+    "enable_gps_tracking": true,
+    "enable_dashcam": true,
+    "enable_google_sheets_sync": true,
+    "google_sheets_secret_key": "PHUAN_SECRET_KEY_123"
+  },
+  "business_rules": {
+    "require_odo_validation": true,
+    "allow_negative_profit": false,
+    "block_inactive_vehicle_dispatch": true,
+    "block_inactive_driver_dispatch": true,
+    "block_inactive_route_dispatch": true
+  }
+}

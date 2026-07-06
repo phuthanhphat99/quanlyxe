@@ -26,7 +26,7 @@ const apiMocker = () => ({
       let body = '';
       req.on('data', (chunk: any) => { body += chunk.toString(); });
       req.on('end', () => {
-        const parts = req.url.split('/').filter(Boolean);
+        const parts = req.url.split('?')[0].split('/').filter(Boolean);
         const collection = parts[0] || 'unknown';
         if (!mockDB[collection]) mockDB[collection] = [];
 
