@@ -3,7 +3,8 @@ const escapeRegExp = (value: string): string => value.replace(/[.*+?^${}()|[\]\\
 export const getMonthlyPrefix = (prefix: string, date: Date = new Date()): string => {
   const yy = String(date.getFullYear()).slice(-2);
   const mm = String(date.getMonth() + 1).padStart(2, '0');
-  return `${prefix}${yy}${mm}-`; // Format: DH2604- (Matches audit regex)
+  const cleanPrefix = prefix.replace(/-$/, ''); // Remove trailing hyphen if any
+  return `${cleanPrefix}-${yy}${mm}-`; // Format: DH-2604- (Matches audit regex)
 };
 
 export const getNextCodeByPrefix = (

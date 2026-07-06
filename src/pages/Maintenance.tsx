@@ -93,7 +93,7 @@ interface MaintenanceOrder {
 
 // Form Schema
 const maintenanceSchema = z.object({
-  order_code: z.string().refine(val => !val || /^(MNT-(\d{4}-)+\d+|MNT\d{4}|BD\d{4}|BD\d{4}-\d+|BD-(\d{4}-)+\d+)$/.test(val), "Mã bảo dưỡng sai chuẩn (VD: BD-2604-01)").optional(),
+  order_code: z.string().refine(val => !val || /^(BD-\d{2}\d{2}-\d+|BD-\d{4}-\d+|BD\d{4}|BD\d{4}-\d+|MNT-(\d{4}-)+\d+|MNT\d{4})$/.test(val), "Mã bảo dưỡng sai chuẩn (VD: BD-2405-01)").optional(),
   vehicle_id: z.string().min(1, "Xe là bắt buộc"),
   maintenance_type: z.enum(['routine', 'repair', 'inspection', 'tire', 'other'] as const),
   description: z.string().min(1, "Mô tả công việc là bắt buộc"),
@@ -761,10 +761,10 @@ export default function Maintenance() {
         columns={importColumns}
         sampleData={[
           {
-            order_code: 'BT2603001',
-            vehicle_license_plate: '29C-12345',
+            order_code: 'BD-2405-01',
+            vehicle_license_plate: 'XE-2405-01',
             maintenance_type: 'Bảo dưỡng định kỳ',
-            scheduled_date: '2024-02-15',
+            scheduled_date: '2024-05-15',
             description: 'Thay dầu, lọc nhớt',
             vendor_name: 'Garage A',
             labor_cost: 500000,

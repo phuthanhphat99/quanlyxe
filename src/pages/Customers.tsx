@@ -66,7 +66,7 @@ type CustomerStatus = 'active' | 'inactive';
 
 // Form Schema Validation
 const customerSchema = z.object({
-  customer_code: z.string().refine(val => !val || /^KH\d{4}$/.test(val), "Mã khách hàng sai định dạng (Bắt buộc KH + 4 số, VD: KH0001)").optional(),
+  customer_code: z.string().refine(val => !val || /^(KH-\d{4}-\d+|KH\d{4}|KH-\d{4})$/.test(val), "Mã khách hàng sai định dạng (Bắt buộc KH + 4 số, VD: KH-2405-01 hoặc KH-0001)").optional(),
   customer_name: z.string().min(1, "Tên khách hàng là bắt buộc"),
   customer_type: z.enum(['Doanh nghiệp', 'Cá nhân'] as const).default('Doanh nghiệp'),
   short_name: z.string().optional(),
@@ -232,17 +232,16 @@ export default function Customers() {
 
   const handleAdd = async () => {
     setSelectedCustomer(null);
-    let nextCode = 'KH0001';
+    let nextCode = 'KH-2405-01';
     try {
       const res = await customerAdapter.getNextCode();
       if (res) nextCode = res;
     } catch (err) {
       console.error("Failed to fetch next customer code", err);
-      nextCode = getNextCodeByPrefix(
-        (customers || []).map(c => c.customer_code),
-        'KH',
-        4
-      );
+      if (customers && customers.length > 0) {
+        const yymm = new Date().toISOString().slice(2, 4) + new Date().toISOString().slice(5, 7);
+        nextCode = `KH-${yymm}-${String(customers.length + 1).padStart(2, '0')}`;
+      }
     }
 
     form.reset({
@@ -693,7 +692,7 @@ export default function Customers() {
         columns={importColumns}
         sampleData={[
           {
-            customer_code: 'KH0001',
+            customer_code: 'KH-2405-01',
             customer_name: 'Công ty TNHH A',
             customer_type: 'Doanh nghiệp',
             tax_code: '0101234567',

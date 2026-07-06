@@ -33,7 +33,12 @@ const apiMocker = () => ({
         res.setHeader('Content-Type', 'application/json');
 
         if (req.method === 'GET') {
-          res.end(JSON.stringify(mockDB[collection]));
+          if (parts[1]) {
+            const found = mockDB[collection].find((item: any) => item.id === parts[1] || item.vehicle_code === parts[1] || item.driver_code === parts[1] || item.customer_code === parts[1] || item.route_code === parts[1]);
+            res.end(JSON.stringify(found || mockDB[collection][0] || null));
+          } else {
+            res.end(JSON.stringify(mockDB[collection]));
+          }
         } else if (req.method === 'POST' || req.method === 'PUT') {
           try {
             const payload = JSON.parse(body || '{}');

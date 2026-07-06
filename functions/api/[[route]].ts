@@ -112,7 +112,7 @@ export async function onRequest(context: any) {
     const tableName = routeParts[0];
     const id = routeParts[1];
 
-    let tenantId = request.headers.get('x-tenant-id');
+    const tenantId = request.headers.get('x-tenant-id');
     
     // Nếu request là OPTIONS (CORS)
     if (request.method === 'OPTIONS') {

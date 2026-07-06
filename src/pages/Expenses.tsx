@@ -91,7 +91,7 @@ interface Expense {
 
 // Form Schema
 const expenseSchema = z.object({
-  expense_code: z.string().refine(val => !val || /^(EXP-(\d{4}-)+[\w\d-]+|EXP\d{4}|PC\d{4}|PC\d{4}-\d+|PC-(\d{4}-)+\d+)$/.test(val), "Mã phiếu chi sai chuẩn (VD: PC-2604-01)").optional(),
+  expense_code: z.string().refine(val => !val || /^(PC-\d{2}\d{2}-\d+|PC-\d{4}-\d+|PC\d{4}|PC\d{4}-\d+|EXP-(\d{4}-)+[\w\d-]+|EXP\d{4})$/.test(val), "Mã phiếu chi sai chuẩn (VD: PC-2405-01)").optional(),
   expense_date: z.string().min(1, "Ngày chi là bắt buộc"),
   category_id: z.string().min(1, "Loại chi phí là bắt buộc"),
   amount: z.coerce.number().min(0, "Số tiền phải lớn hơn hoặc bằng 0"),
@@ -955,12 +955,12 @@ export default function Expenses() {
         columns={importColumns}
         sampleData={[
           {
-            expense_code: 'CP2603001',
-            expense_date: '2024-02-01',
+            expense_code: 'PC-2405-01',
+            expense_date: '2024-05-01',
             category_name: 'Nhiên liệu',
             amount: 2000000,
-            description: 'Đổ dầu xe 29C-12345',
-            license_plate: '29C-12345',
+            description: 'Đổ dầu xe XE-2405-01',
+            license_plate: 'XE-2405-01',
             vendor_name: 'Cây xăng A'
           }
         ]}

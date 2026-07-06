@@ -1139,12 +1139,9 @@ const tripFirestoreAdapter = {
         }
         // Guard B3: Route must be active and have costs
         if (data.route_id) {
-            const rSnap = await getDoc(doc(db, 'routes', data.route_id));
-            if (rSnap.exists()) {
-                const routeData = rSnap.data();
-                if (routeData.status === 'inactive') {
-                    throw new Error(`Tuyến đường ${routeData.route_name} đã ngừng hoạt động. Không thể tạo lệnh.`);
-                }
+            const routeData = await (createD1Adapter('routes') as any).getById(data.route_id);
+            if (routeData && routeData.status === 'inactive') {
+                throw new Error(`Tuyến đường ${routeData.route_name} đã ngừng hoạt động. Không thể tạo lệnh.`);
             }
         }
         // ===== END GUARDS =====
@@ -1156,9 +1153,8 @@ const tripFirestoreAdapter = {
         // 2. If trip has route, auto-generate DRAFT expenses for real-time reporting
         if (data.route_id) {
             try {
-                const routeSnap = await getDoc(doc(db, 'routes', data.route_id));
-                if (routeSnap.exists()) {
-                    const route = routeSnap.data();
+                const route = await (createD1Adapter('routes') as any).getById(data.route_id);
+                if (route) {
                     const now = new Date();
                     const dateStr = now.toISOString().slice(0, 10);
                     
@@ -1509,29 +1505,27 @@ const tripLocationFirestoreAdapter = {
 // AUDIT FIX C1: Separate confirmed vs estimated expenses for accurate profit
 const recalculateTripExpenses = async (tripId: string, tenantId: string) => {
     if (!tripId) return;
-    const q = query(
-        collection(db, 'expenses'), 
-        where("tenant_id", "==", tenantId), 
-        where("trip_id", "==", tripId),
-        where("is_deleted", "==", 0)
-    );
-    const snapshot = await getDocs(q);
-    let confirmedExpenses = 0;  // Only accountant-approved → affects REAL profit
-    let estimatedExpenses = 0;  // Draft/pending → for forecasting only
-    snapshot.forEach(d => {
-        const data = d.data();
-        if (data.status === 'confirmed') {
-            confirmedExpenses += (data.amount || 0);
-        } else if (data.status === 'draft' || data.status === 'pending') {
-            estimatedExpenses += (data.amount || 0);
-        }
-    });
-    await updateDoc(doc(db, 'trips', tripId), { 
-        total_expenses: confirmedExpenses,           // REAL profit calculation
-        estimated_expenses: estimatedExpenses,        // For forecasting dashboard
-        total_all_expenses: confirmedExpenses + estimatedExpenses, // Grand total
-        updated_at: new Date().toISOString()
-    });
+    try {
+        const allExpenses = await (createD1Adapter('expenses') as any).list();
+        const snapshot = allExpenses.filter((e: any) => e.trip_id === tripId && (e.is_deleted === 0 || !e.is_deleted));
+        let confirmedExpenses = 0;  // Only accountant-approved → affects REAL profit
+        let estimatedExpenses = 0;  // Draft/pending → for forecasting only
+        snapshot.forEach((data: any) => {
+            if (data.status === 'confirmed' || data.status === 'approved') {
+                confirmedExpenses += (data.amount || 0);
+            } else if (data.status === 'draft' || data.status === 'pending') {
+                estimatedExpenses += (data.amount || 0);
+            }
+        });
+        await (createD1Adapter('trips') as any).update(tripId, { 
+            total_expenses: confirmedExpenses,           // REAL profit calculation
+            estimated_expenses: estimatedExpenses,        // For forecasting dashboard
+            total_all_expenses: confirmedExpenses + estimatedExpenses, // Grand total
+            updated_at: new Date().toISOString()
+        });
+    } catch (err) {
+        console.warn('recalculateTripExpenses error:', err);
+    }
 };
 
 // Specialized adapter for Expenses to handle Trip recalculations
@@ -1569,14 +1563,17 @@ const expenseFirestoreAdapter = {
         );
 
         if (isFuelOrMaint && data.vehicle_id && data.odometer_reading) {
-            const vRef = doc(db, 'vehicles', data.vehicle_id);
-            const vSnap = await getDoc(vRef);
-            if (vSnap.exists()) {
-                const currentOdo = vSnap.data().current_odometer || 0;
-                if (data.odometer_reading < currentOdo) {
-                    throw new Error(`Gian lận/Sai sót ODO: Chỉ số ODO mới (${data.odometer_reading}) không được thấp hơn ODO hiện tại của xe (${currentOdo}).`);
+            try {
+                const vData = await (createD1Adapter('vehicles') as any).getById(data.vehicle_id);
+                if (vData) {
+                    const currentOdo = vData.current_odometer || 0;
+                    if (data.odometer_reading < currentOdo) {
+                        throw new Error(`Gian lận/Sai sót ODO: Chỉ số ODO mới (${data.odometer_reading}) không được thấp hơn ODO hiện tại của xe (${currentOdo}).`);
+                    }
+                    await (createD1Adapter('vehicles') as any).update(data.vehicle_id, { current_odometer: data.odometer_reading });
                 }
-                await updateDoc(vRef, { current_odometer: data.odometer_reading });
+            } catch (err: any) {
+                if (err?.message?.includes('Gian lận/Sai sót ODO')) throw err;
             }
         }
         // -------------------------------------

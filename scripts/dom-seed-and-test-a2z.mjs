@@ -2,7 +2,7 @@ import { chromium } from 'playwright';
 import fs from 'fs';
 import path from 'path';
 
-const BASE = 'http://localhost:5173';
+const BASE = process.env.BASE_URL || 'http://127.0.0.1:5175';
 const SCREENSHOT_DIR = path.resolve('d:/QUANLYXE_ONLINE/quanlyxe/qa-screenshots');
 if (!fs.existsSync(SCREENSHOT_DIR)) fs.mkdirSync(SCREENSHOT_DIR, { recursive: true });
 

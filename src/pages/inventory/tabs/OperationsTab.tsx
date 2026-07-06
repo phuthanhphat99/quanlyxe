@@ -8,7 +8,7 @@ import { Badge } from "@/components/ui/badge";
 import { PlusCircle, ArrowDownToLine, ArrowUpToLine, Search, FileSpreadsheet, Printer } from "lucide-react";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { exportToExcel, exportToCSV, printTable } from '@/lib/export-utils';
-import { DataTable, Column } from "@/components/shared/DataTable";
+import { ExcelImportDialog, ImportColumn } from "@/components/shared/ExcelImportDialog";
 import { ExcelFilter } from "@/components/vehicles/ExcelFilter";
 import { ColumnChooser } from "@/components/vehicles/ColumnChooser";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
@@ -33,10 +33,46 @@ export function OperationsTab() {
   const [isAddItemModalOpen, setAddItemModalOpen] = useState(false);
   const [isImportModalOpen, setImportModalOpen] = useState(false);
   const [isExportModalOpen, setExportModalOpen] = useState(false);
+  const [importExcelDialogOpen, setImportExcelDialogOpen] = useState(false);
   
+  const importColumns: ImportColumn[] = [
+    { key: 'item_code', header: 'Mã Vật Tư/Lốp', required: true },
+    { key: 'name', header: 'Tên Vật Tư/Lốp', required: true },
+    { key: 'category', header: 'Danh Mục', required: true },
+    { key: 'unit', header: 'Đơn Vị', required: true },
+    { key: 'min_stock_level', header: 'Tồn Tối Thiểu', type: 'number' },
+    { key: 'current_stock', header: 'Tồn Kho', type: 'number', required: true },
+    { key: 'average_cost', header: 'Đơn Giá TB', type: 'number' },
+    { key: 'location', header: 'Vị Trí' },
+  ];
+
+  const handleExcelImport = async (data: any[]) => {
+    try {
+      let importedCount = 0;
+      for (const row of data) {
+        if (!row.item_code || !row.name) continue;
+        createItem.mutate({
+          item_code: String(row.item_code),
+          name: String(row.name),
+          category: String(row.category || 'Lốp Xe'),
+          unit: String(row.unit || 'Cái'),
+          min_stock_level: Number(row.min_stock_level) || 5,
+          current_stock: Number(row.current_stock) || 0,
+          average_cost: Number(row.average_cost) || 0,
+          total_value: (Number(row.current_stock) || 0) * (Number(row.average_cost) || 0),
+          location: String(row.location || '')
+        });
+        importedCount++;
+      }
+      toast({ title: "Nhập Excel thành công", description: `Đã xếp hàng thêm ${importedCount} mã vật tư/lốp.` });
+    } catch (error) {
+      toast({ title: "Lỗi nhập Excel", description: "Đã có lỗi xảy ra", variant: "destructive" });
+    }
+  };
+
   // Forms state
   const [itemFormData, setItemFormData] = useState({
-    item_code: '', name: '', category: 'Vật Tư', unit: 'Cái', min_stock_level: '5',
+    item_code: '', name: '', category: 'Lốp Xe', unit: 'Cái', min_stock_level: '5',
     current_stock: '0', average_cost: '0', location: ''
   });
 
@@ -48,6 +84,14 @@ export function OperationsTab() {
   });
 
   const handleCreateItem = () => {
+    if (!itemFormData.item_code || !itemFormData.name) {
+      toast({ title: "Thiếu thông tin", description: "Vui lòng nhập mã và tên", variant: "destructive" });
+      return;
+    }
+    if (!/^(LOP-\d{4}-\d+|LOP\d{4}|LOP-\d{4}|VT-\d{4}-\d+|VT\d{4}|VT-\d{4})$/.test(itemFormData.item_code)) {
+      toast({ title: "Sai định dạng mã", description: "Mã sai định dạng (VD: LOP-2405-01 hoặc VT-2405-01)", variant: "destructive" });
+      return;
+    }
     createItem.mutate({
       item_code: itemFormData.item_code,
       name: itemFormData.name,
@@ -59,8 +103,24 @@ export function OperationsTab() {
       total_value: Number(itemFormData.current_stock) * Number(itemFormData.average_cost),
       location: itemFormData.location
     }, {
-      onSuccess: () => setAddItemModalOpen(false)
+      onSuccess: () => {
+        setAddItemModalOpen(false);
+        setItemFormData({ item_code: '', name: '', category: 'Lốp Xe', unit: 'Cái', min_stock_level: '5', current_stock: '0', average_cost: '0', location: '' });
+      }
     });
+  };
+
+  const handleAddClick = () => {
+    let nextCode = `LOP-2405-01`;
+    if (items && items.length > 0) {
+      const yymm = new Date().toISOString().slice(2, 4) + new Date().toISOString().slice(5, 7);
+      nextCode = `LOP-${yymm}-${String(items.length + 1).padStart(2, '0')}`;
+    }
+    setItemFormData({
+      item_code: nextCode, name: '', category: 'Lốp Xe', unit: 'Cái', min_stock_level: '5',
+      current_stock: '0', average_cost: '0', location: ''
+    });
+    setAddItemModalOpen(true);
   };
 
   const handleTransaction = (type: 'IN_NEW' | 'OUT_REPAIR') => {
@@ -240,9 +300,13 @@ export function OperationsTab() {
             </DropdownMenuContent>
           </DropdownMenu>
 
-          <Button size="sm" onClick={() => setAddItemModalOpen(true)} className="h-8 gap-1 ml-1" variant="outline">
+          <Button size="sm" onClick={() => setImportExcelDialogOpen(true)} className="h-8 gap-1 ml-1" variant="outline">
+            <FileSpreadsheet className="w-4 h-4 mr-1 text-slate-500" />
+            Nhập Excel
+          </Button>
+          <Button size="sm" onClick={handleAddClick} className="h-8 gap-1 ml-1" variant="outline">
             <PlusCircle className="w-4 h-4 mr-1 text-slate-500" />
-            Tạo Mã Vật Tư
+            Tạo Mã Vật Tư/Lốp
           </Button>
         </div>
       </div>
@@ -290,6 +354,27 @@ export function OperationsTab() {
           ))
         )}
       </div>
+
+      {/* --- MODAL: NHẬP EXCEL --- */}
+      <ExcelImportDialog
+        isOpen={importExcelDialogOpen}
+        onClose={() => setImportExcelDialogOpen(false)}
+        onImport={handleExcelImport}
+        entityName="Vật tư / Lốp"
+        columns={importColumns}
+        sampleData={[
+          {
+            item_code: 'LOP-2405-01',
+            name: 'Lốp Michelin 11R22.5',
+            category: 'Lốp Xe',
+            unit: 'Cái',
+            min_stock_level: 10,
+            current_stock: 20,
+            average_cost: 6500000,
+            location: 'Kho Lốp'
+          }
+        ]}
+      />
 
       {/* --- MODAL: TẠO MÃ VẬT TƯ --- */}
       <Dialog open={isAddItemModalOpen} onOpenChange={setAddItemModalOpen}>

@@ -17,7 +17,7 @@ import {
 import { useInventoryItems, useCreateInventoryItem, useCreateTransaction, useInventoryTransactions } from '@/hooks/useInventory';
 import { exportToExcel, exportToCSV, printTable } from '@/lib/export-utils';
 import { useToast } from "@/hooks/use-toast";
-import { DataTable, Column } from "@/components/shared/DataTable";
+import { ExcelImportDialog, ImportColumn } from "@/components/shared/ExcelImportDialog";
 import { ExcelFilter } from "@/components/vehicles/ExcelFilter";
 import { ColumnChooser } from "@/components/vehicles/ColumnChooser";
 import { PageHeader } from "@/components/shared/PageHeader";
@@ -130,10 +130,45 @@ export default function ToolsInventory() {
     return Array.from(cats);
   }, [items]);
 
-  // ─── MODALS ───
   const [isAddItemModalOpen, setAddItemModalOpen] = useState(false);
   const [isImportModalOpen, setImportModalOpen] = useState(false);
   const [isExportModalOpen, setExportModalOpen] = useState(false);
+  const [importExcelDialogOpen, setImportExcelDialogOpen] = useState(false);
+
+  const importColumns: ImportColumn[] = [
+    { key: 'item_code', header: 'Mã CCDC', required: true },
+    { key: 'name', header: 'Tên CCDC', required: true },
+    { key: 'category', header: 'Danh Mục', required: true },
+    { key: 'unit', header: 'Đơn Vị', required: true },
+    { key: 'min_stock_level', header: 'Tồn Tối Thiểu', type: 'number' },
+    { key: 'current_stock', header: 'Tồn Kho', type: 'number', required: true },
+    { key: 'average_cost', header: 'Đơn Giá TB', type: 'number' },
+    { key: 'location', header: 'Vị Trí' },
+  ];
+
+  const handleExcelImport = async (data: any[]) => {
+    try {
+      let importedCount = 0;
+      for (const row of data) {
+        if (!row.item_code || !row.name) continue;
+        createItem.mutate({
+          item_code: String(row.item_code),
+          name: String(row.name),
+          category: String(row.category || 'CCDC'),
+          unit: String(row.unit || 'Cái'),
+          min_stock_level: Number(row.min_stock_level) || 2,
+          current_stock: Number(row.current_stock) || 0,
+          average_cost: Number(row.average_cost) || 0,
+          total_value: (Number(row.current_stock) || 0) * (Number(row.average_cost) || 0),
+          location: String(row.location || '')
+        });
+        importedCount++;
+      }
+      toast({ title: "Nhập Excel thành công", description: `Đã xếp hàng thêm ${importedCount} CCDC.` });
+    } catch (error) {
+      toast({ title: "Lỗi nhập Excel", description: "Đã có lỗi xảy ra", variant: "destructive" });
+    }
+  };
 
   const [itemFormData, setItemFormData] = useState({
     item_code: '', name: '', category: 'CCDC', unit: 'Cái', min_stock_level: '2',
@@ -147,6 +182,10 @@ export default function ToolsInventory() {
   const handleCreateItem = () => {
     if (!itemFormData.item_code || !itemFormData.name) {
       toast({ title: "Thiếu thông tin", description: "Vui lòng nhập mã và tên CCDC", variant: "destructive" });
+      return;
+    }
+    if (!/^(CC-\d{4}-\d+|CC\d{4}|CC-\d{4})$/.test(itemFormData.item_code)) {
+      toast({ title: "Sai định dạng mã", description: "Mã CCDC sai định dạng (VD: CC-2405-01)", variant: "destructive" });
       return;
     }
     createItem.mutate({
@@ -165,6 +204,19 @@ export default function ToolsInventory() {
         setItemFormData({ item_code: '', name: '', category: 'CCDC', unit: 'Cái', min_stock_level: '2', current_stock: '0', average_cost: '0', location: '' });
       }
     });
+  };
+
+  const handleAddClick = () => {
+    let nextCode = `CC-2405-01`;
+    if (items && items.length > 0) {
+      const yymm = new Date().toISOString().slice(2, 4) + new Date().toISOString().slice(5, 7);
+      nextCode = `CC-${yymm}-${String(items.length + 1).padStart(2, '0')}`;
+    }
+    setItemFormData({
+      item_code: nextCode, name: '', category: 'CCDC', unit: 'Cái', min_stock_level: '2',
+      current_stock: '0', average_cost: '0', location: ''
+    });
+    setAddItemModalOpen(true);
   };
 
   const handleTransaction = (type: 'IN_NEW' | 'OUT_REPAIR') => {
@@ -445,7 +497,10 @@ export default function ToolsInventory() {
                 </DropdownMenuContent>
               </DropdownMenu>
 
-              <Button size="sm" onClick={() => setAddItemModalOpen(true)} className="h-8 gap-1 ml-1" variant="outline">
+              <Button size="sm" onClick={() => setImportExcelDialogOpen(true)} className="h-8 gap-1 ml-1" variant="outline">
+                <FileSpreadsheet className="w-4 h-4" /> <span className="hidden sm:inline">Nhập Excel</span>
+              </Button>
+              <Button size="sm" onClick={handleAddClick} className="h-8 gap-1 ml-1" variant="outline">
                 <PlusCircle className="w-4 h-4 mr-1 text-slate-500" />
                 Tạo Mã CCDC
               </Button>
@@ -671,6 +726,29 @@ export default function ToolsInventory() {
           </div>
         </TabsContent>
       </Tabs>
+
+      {/* ═══════════════════════════════════════════════════════ */}
+      {/* MODAL: NHẬP EXCEL */}
+      {/* ═══════════════════════════════════════════════════════ */}
+      <ExcelImportDialog
+        isOpen={importExcelDialogOpen}
+        onClose={() => setImportExcelDialogOpen(false)}
+        onImport={handleExcelImport}
+        entityName="CCDC"
+        columns={importColumns}
+        sampleData={[
+          {
+            item_code: 'CC-2405-01',
+            name: 'Máy khoan pin Makita',
+            category: 'Thiết bị cầm tay',
+            unit: 'Cái',
+            min_stock_level: 2,
+            current_stock: 5,
+            average_cost: 2500000,
+            location: 'Kệ B1'
+          }
+        ]}
+      />
 
       {/* ═══════════════════════════════════════════════════════ */}
       {/* MODAL: TẠO MÃ CCDC */}

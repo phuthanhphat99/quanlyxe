@@ -18,6 +18,7 @@ import { useInventoryItems, useCreateInventoryItem, useCreateTransaction, useInv
 import { exportToExcel, exportToCSV, printTable } from '@/lib/export-utils';
 import { useToast } from "@/hooks/use-toast";
 import { DataTable, Column } from "@/components/shared/DataTable";
+import { ExcelImportDialog, ImportColumn } from "@/components/shared/ExcelImportDialog";
 import { ExcelFilter } from "@/components/vehicles/ExcelFilter";
 import { ColumnChooser } from "@/components/vehicles/ColumnChooser";
 import { PageHeader } from "@/components/shared/PageHeader";
@@ -133,6 +134,42 @@ export default function MaterialsInventory() {
   const [isAddItemModalOpen, setAddItemModalOpen] = useState(false);
   const [isImportModalOpen, setImportModalOpen] = useState(false);
   const [isExportModalOpen, setExportModalOpen] = useState(false);
+  const [importExcelDialogOpen, setImportExcelDialogOpen] = useState(false);
+
+  const importColumns: ImportColumn[] = [
+    { key: 'item_code', header: 'Mã VT', required: true },
+    { key: 'name', header: 'Tên Vật Tư', required: true },
+    { key: 'category', header: 'Danh Mục', required: true },
+    { key: 'unit', header: 'Đơn Vị', required: true },
+    { key: 'min_stock_level', header: 'Tồn Tối Thiểu', type: 'number' },
+    { key: 'current_stock', header: 'Tồn Kho', type: 'number', required: true },
+    { key: 'average_cost', header: 'Đơn Giá TB', type: 'number' },
+    { key: 'location', header: 'Vị Trí' },
+  ];
+
+  const handleExcelImport = async (data: any[]) => {
+    try {
+      let importedCount = 0;
+      for (const row of data) {
+        if (!row.item_code || !row.name) continue;
+        createItem.mutate({
+          item_code: String(row.item_code),
+          name: String(row.name),
+          category: String(row.category || 'Vật Tư'),
+          unit: String(row.unit || 'Cái'),
+          min_stock_level: Number(row.min_stock_level) || 5,
+          current_stock: Number(row.current_stock) || 0,
+          average_cost: Number(row.average_cost) || 0,
+          total_value: (Number(row.current_stock) || 0) * (Number(row.average_cost) || 0),
+          location: String(row.location || '')
+        });
+        importedCount++;
+      }
+      toast({ title: "Nhập Excel thành công", description: `Đã xếp hàng thêm ${importedCount} vật tư.` });
+    } catch (error) {
+      toast({ title: "Lỗi nhập Excel", description: "Đã có lỗi xảy ra", variant: "destructive" });
+    }
+  };
 
   const [itemFormData, setItemFormData] = useState({
     item_code: '', name: '', category: 'Vật Tư', unit: 'Cái', min_stock_level: '5',
@@ -146,6 +183,10 @@ export default function MaterialsInventory() {
   const handleCreateItem = () => {
     if (!itemFormData.item_code || !itemFormData.name) {
       toast({ title: "Thiếu thông tin", description: "Vui lòng nhập mã và tên vật tư", variant: "destructive" });
+      return;
+    }
+    if (!/^(VT-\d{4}-\d+|VT\d{4}|VT-\d{4})$/.test(itemFormData.item_code)) {
+      toast({ title: "Sai định dạng mã", description: "Mã vật tư sai định dạng (Bắt buộc VT + số, VD: VT-2405-01)", variant: "destructive" });
       return;
     }
     createItem.mutate({
@@ -164,6 +205,19 @@ export default function MaterialsInventory() {
         setItemFormData({ item_code: '', name: '', category: 'Vật Tư', unit: 'Cái', min_stock_level: '5', current_stock: '0', average_cost: '0', location: '' });
       }
     });
+  };
+
+  const handleAddClick = () => {
+    let nextCode = `VT-2405-01`;
+    if (items && items.length > 0) {
+      const yymm = new Date().toISOString().slice(2, 4) + new Date().toISOString().slice(5, 7);
+      nextCode = `VT-${yymm}-${String(items.length + 1).padStart(2, '0')}`;
+    }
+    setItemFormData({
+      item_code: nextCode, name: '', category: 'Vật Tư', unit: 'Cái', min_stock_level: '5',
+      current_stock: '0', average_cost: '0', location: ''
+    });
+    setAddItemModalOpen(true);
   };
 
   const handleTransaction = (type: 'IN_NEW' | 'OUT_REPAIR') => {
@@ -405,7 +459,10 @@ export default function MaterialsInventory() {
 
             {/* Right Side: Actions (Compact) */}
             <div className="flex flex-wrap items-center gap-1 w-full xl:w-auto justify-end">
-              <Button size="sm" onClick={() => setAddItemModalOpen(true)} className="h-8 gap-1 ml-1" variant="outline">
+              <Button size="sm" onClick={() => setImportExcelDialogOpen(true)} className="h-8 gap-1 ml-1" variant="outline">
+                <FileSpreadsheet className="w-4 h-4" /> <span className="hidden sm:inline">Nhập Excel</span>
+              </Button>
+              <Button size="sm" onClick={handleAddClick} className="h-8 gap-1 ml-1" variant="outline">
                 <PlusCircle className="w-4 h-4" /> <span className="hidden sm:inline">Tạo Mã</span>
               </Button>
               <Button size="sm" onClick={() => setImportModalOpen(true)} className="bg-emerald-600 hover:bg-emerald-700 text-white h-8 px-2 sm:px-3 shadow-sm">
@@ -642,6 +699,26 @@ export default function MaterialsInventory() {
       {/* ═══════════════════════════════════════════════════════ */}
       {/* MODAL: TẠO MÃ VẬT TƯ */}
       {/* ═══════════════════════════════════════════════════════ */}
+      <ExcelImportDialog
+        isOpen={importExcelDialogOpen}
+        onClose={() => setImportExcelDialogOpen(false)}
+        onImport={handleExcelImport}
+        entityName="Vật tư"
+        columns={importColumns}
+        sampleData={[
+          {
+            item_code: 'VT-2405-01',
+            name: 'Nhớt động cơ Castrol',
+            category: 'Vật Tư',
+            unit: 'Can 18L',
+            min_stock_level: 5,
+            current_stock: 10,
+            average_cost: 1500000,
+            location: 'Kệ A1'
+          }
+        ]}
+      />
+
       <Dialog open={isAddItemModalOpen} onOpenChange={setAddItemModalOpen}>
         <DialogContent className="max-w-md">
           <DialogHeader><DialogTitle>Tạo Mã Vật Tư Mới</DialogTitle></DialogHeader>

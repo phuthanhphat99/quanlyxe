@@ -33,6 +33,16 @@ export const createD1Adapter = (collectionName: string) => ({
         if (!res.ok) throw new Error(`Fetch error: ${res.statusText}`);
         return await res.json();
     },
+    getById: async (id: string) => {
+        const tenantId = getTenantId();
+        if (!tenantId) return null;
+        const res = await fetch(`${API_BASE}/${collectionName}/${id}`, {
+            headers: { 'x-tenant-id': tenantId }
+        });
+        if (res.status === 404) return null;
+        if (!res.ok) throw new Error(`Fetch error: ${res.statusText}`);
+        return await res.json();
+    },
     create: async (data: any) => {
         const tenantId = getTenantId() || data.tenant_id;
         const res = await fetch(`${API_BASE}/${collectionName}`, {

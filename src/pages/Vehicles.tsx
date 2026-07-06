@@ -102,7 +102,7 @@ interface Vehicle {
 
 // Form Schema Validation - đầy đủ 26 trường theo Excel
 const vehicleSchema = z.object({
-  vehicle_code: z.string().refine(val => !val || /^(VEH-\d{4}-\d+|VEH\d{4}|XE\d{4})$/.test(val), "Mã xe sai chuẩn (VD: VEH-2604-01)").optional(), // Auto-generated if empty
+  vehicle_code: z.string().refine(val => !val || /^(XE-\d{4}-\d+|XE\d{4}|XE-\d{4})$/.test(val), "Mã xe sai chuẩn (VD: XE-2405-01 hoặc XE-0001)").optional(), // Auto-generated if empty
   license_plate: z.string().min(1, "Biển số là bắt buộc"),
   vehicle_type: z.string().min(1, "Loại xe là bắt buộc"),
   brand: z.string().optional(),
@@ -283,7 +283,7 @@ export default function Vehicles() {
     // ----------------------------
 
     setSelectedVehicle(null);
-    let nextCode = `VEH-2604-01`;
+    let nextCode = `XE-2405-01`;
     try {
       const res = await vehicleAdapter.getNextCode();
       if (res && typeof res === 'string') {
@@ -297,7 +297,7 @@ export default function Vehicles() {
           return Math.max(max, num);
         }, 0);
         const yymm = new Date().toISOString().slice(2, 4) + new Date().toISOString().slice(5, 7);
-        nextCode = `VEH-${yymm}-${String(maxCode + 1).padStart(2, '0')}`;
+        nextCode = `XE-${yymm}-${String(maxCode + 1).padStart(2, '0')}`;
       }
     }
 
@@ -1635,7 +1635,7 @@ export default function Vehicles() {
         }))}
         sampleData={[
           {
-            vehicle_code: 'VEH-2604-01',
+            vehicle_code: 'XE-2405-01',
             license_plate: '79H-012.34',
             vehicle_type: 'Xe đầu kéo',
             brand: 'Hino 700 Series',
